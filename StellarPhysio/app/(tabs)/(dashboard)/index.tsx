@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
-import Button from '../components/Button';
+import { colors } from '@/utils/colors';
+import Button from '@/components/Button';
 
 interface QuickAccessTile {
   title: string;
@@ -29,10 +29,10 @@ interface LastAppointment {
 
 const DashboardScreen: React.FC = () => {
   const quickAccessTiles: QuickAccessTile[] = [
-    { title: 'Book Appointment', icon: 'calendar', screen: 'book-appointment' },
+    { title: 'Book Appointment', icon: 'calendar', screen: 'book_appointment' },
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
-    { title: 'Feedback', icon: 'star', screen: 'feedback' },
+    { title: 'Prescriptions & Charges', icon: 'document-text', screen: 'prescriptions-charges' },
   ];
 
   const notifications: Notification[] = [
@@ -58,8 +58,8 @@ const DashboardScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.greeting}>Welcome, John!</Text>
       <ScrollView style={styles.scrollView}>
-        <Text style={styles.greeting}>Welcome, John!</Text>
         <View style={styles.tilesContainer}>
           {quickAccessTiles.map((tile, index) => (
             <Link key={index} href={`/${tile.screen}`} asChild>
@@ -133,22 +133,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    paddingTop: 24,
   },
   scrollView: {
+    paddingBottom: 24,
+    paddingHorizontal: 24,
     flex: 1,
-    padding: 24,
   },
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 24,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   tilesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 24,
   },
   tile: {
     width: '48%',
@@ -171,6 +173,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     padding: 16,
+    marginVertical: 10,
   },
   sectionTitle: {
     fontSize: 18,

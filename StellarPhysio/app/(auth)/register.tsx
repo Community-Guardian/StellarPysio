@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '../../utils/colors';
 
 const RegistrationScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');

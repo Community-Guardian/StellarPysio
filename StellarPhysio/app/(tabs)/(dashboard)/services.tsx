@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '@/utils/colors';
 
 interface Service {
   id: string;
@@ -40,7 +40,6 @@ const ServicesScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Our Services</Text>
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={24} color={colors.lightText} />
         <TextInput

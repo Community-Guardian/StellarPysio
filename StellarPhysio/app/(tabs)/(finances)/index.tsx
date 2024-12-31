@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert,ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
-import Button from '../components/Button';
+import { colors } from '@/utils/colors';
+import Button from '@/components/Button';
 
 interface PaymentHistory {
   id: string;
@@ -15,6 +15,13 @@ interface FavoriteNumber {
   id: string;
   name: string;
   number: string;
+}
+
+interface PendingCharge {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
 }
 
 const PaymentsScreen: React.FC = () => {
@@ -32,6 +39,11 @@ const PaymentsScreen: React.FC = () => {
   const [favoriteNumbers, setFavoriteNumbers] = useState<FavoriteNumber[]>([
     { id: '1', name: 'Personal', number: '0712345678' },
     { id: '2', name: 'Work', number: '0723456789' },
+  ]);
+
+  const [pendingCharges, setPendingCharges] = useState<PendingCharge[]>([
+    { id: '1', date: '2023-05-10', description: 'Consultation Fee', amount: 1500 },
+    { id: '2', date: '2023-05-12', description: 'X-Ray Test', amount: 3000 },
   ]);
 
   const handlePayment = () => {
@@ -101,82 +113,116 @@ const PaymentsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Payments</Text>
-      
-      <View style={styles.mpesaSection}>
-        <Text style={styles.sectionTitle}>Pay with M-Pesa</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="M-Pesa Number"
-          value={mpesaNumber}
-          onChangeText={setMpesaNumber}
-          keyboardType="phone-pad"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Amount (KES)"
-          value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
-        />
-        <Button title="Pay Now" onPress={handlePayment} style={styles.payButton} />
-      </View>
-
-      <View style={styles.favoriteNumbersSection}>
-        <Text style={styles.sectionTitle}>Favorite Numbers</Text>
-        <FlatList
-          data={favoriteNumbers}
-          renderItem={renderFavoriteNumber}
-          keyExtractor={item => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
-
-      <View style={styles.loyaltySection}>
-        <Text style={styles.sectionTitle}>Loyalty Points</Text>
-        <Text style={styles.loyaltyPoints}>{loyaltyPoints} points</Text>
-        <Text style={styles.loyaltyInfo}>Earn 1 point for every 10 KES spent</Text>
-      </View>
-
-      <View style={styles.promoSection}>
-        <Text style={styles.sectionTitle}>Promo Code</Text>
-        <View style={styles.promoInputContainer}>
+      <ScrollView style={styles.scrollContent}>
+        <View style={styles.mpesaSection}>
+          <Text style={styles.sectionTitle}>Pay with M-Pesa</Text>
           <TextInput
-            style={styles.promoInput}
-            placeholder="Enter promo code"
-            value={promoCode}
-            onChangeText={setPromoCode}
+            style={styles.input}
+            placeholder="M-Pesa Number"
+            value={mpesaNumber}
+            onChangeText={setMpesaNumber}
+            keyboardType="phone-pad"
           />
-          <TouchableOpacity style={styles.promoButton} onPress={applyPromoCode}>
-            <Text style={styles.promoButtonText}>Apply</Text>
-          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Amount (KES)"
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+          />
+          <Button title="Pay Now" onPress={handlePayment} style={styles.payButton} />
         </View>
-      </View>
-
-      <View style={styles.historySection}>
-        <Text style={styles.sectionTitle}>Payment History</Text>
-        <FlatList
-          data={paymentHistory}
-          renderItem={renderPaymentHistoryItem}
-          keyExtractor={item => item.id}
-        />
-      </View>
+  
+        <View style={styles.pendingChargesSection}>
+          <Text style={styles.sectionTitle}>Pending Charges</Text>
+          {pendingCharges.map((charge) => (
+            <View key={charge.id} style={styles.chargeItem}>
+              <View>
+                <Text style={styles.chargeDate}>{charge.date}</Text>
+                <Text style={styles.chargeDescription}>{charge.description}</Text>
+              </View>
+              <View style={styles.chargeAmountContainer}>
+                <Text style={styles.chargeAmount}>KES {charge.amount}</Text>
+                <TouchableOpacity
+                  style={styles.payNowButton}
+                  onPress={() => {
+                    setMpesaNumber('');
+                    setAmount(charge.amount.toString());
+                  }}
+                >
+                  <Text style={styles.payNowButtonText}>Pay Now</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+  
+        <View style={styles.favoriteNumbersSection}>
+          <Text style={styles.sectionTitle}>Favorite Numbers</Text>
+          <FlatList
+            data={favoriteNumbers}
+            renderItem={renderFavoriteNumber}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+  
+        <View style={styles.loyaltySection}>
+          <Text style={styles.sectionTitle}>Loyalty Points</Text>
+          <Text style={styles.loyaltyPoints}>{loyaltyPoints} points</Text>
+          <Text style={styles.loyaltyInfo}>Earn 1 point for every 10 KES spent</Text>
+        </View>
+  
+        <View style={styles.promoSection}>
+          <Text style={styles.sectionTitle}>Promo Code</Text>
+          <View style={styles.promoInputContainer}>
+            <TextInput
+              style={styles.promoInput}
+              placeholder="Enter promo code"
+              value={promoCode}
+              onChangeText={setPromoCode}
+            />
+            <TouchableOpacity style={styles.promoButton} onPress={applyPromoCode}>
+              <Text style={styles.promoButtonText}>Apply</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+  
+        <View style={styles.historySection}>
+          <Text style={styles.sectionTitle}>Payment History</Text>
+          <FlatList
+            data={paymentHistory}
+            renderItem={renderPaymentHistoryItem}
+            keyExtractor={(item) => item.id}
+            nestedScrollEnabled
+          />
+        </View>
+      </ScrollView>
     </View>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: 24,
+    paddingTop: 24,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+    paddingHorizontal: 24,
+    flex: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 24,
+    marginBottom: 10,
+    paddingHorizontal: 24,
+  },
+  scrollView: {
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
@@ -288,6 +334,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.primary,
+  },
+  pendingChargesSection: {
+    marginBottom: 24,
+  },
+  chargeItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+  },
+  chargeDate: {
+    fontSize: 14,
+    color: colors.lightText,
+  },
+  chargeDescription: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.text,
+  },
+  chargeAmountContainer: {
+    alignItems: 'flex-end',
+  },
+  chargeAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  payNowButton: {
+    backgroundColor: colors.secondary,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  payNowButtonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 });
 

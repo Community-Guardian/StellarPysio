@@ -1,25 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TextInput, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Button from '../components/Button';
-import { colors } from '../utils/colors';
+import Button from '@/components/Button';
+import { colors } from '@/utils/colors';
 
 const BookAppointmentScreen: React.FC = () => {
   const [service, setService] = useState('');
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [notes, setNotes] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleConfirmAppointment = () => {
-    // Implement appointment booking logic here
     console.log('Appointment confirmed');
+    console.log({ service, date, time, notes });
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) setDate(selectedDate);
+  };
+
+  const onTimeChange = (event: any, selectedTime?: Date) => {
+    setShowTimePicker(false);
+    if (selectedTime) setTime(selectedTime);
   };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Book Appointment</Text>
       <View style={styles.formContainer}>
+        {/* Service Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Service Type</Text>
           <View style={styles.pickerContainer}>
@@ -35,24 +47,46 @@ const BookAppointmentScreen: React.FC = () => {
             </Picker>
           </View>
         </View>
+
+        {/* Date Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Date</Text>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => setDate(selectedDate || date)}
-          />
+          <Text
+            style={styles.datePickerText}
+            onPress={() => setShowDatePicker(true)}
+          >
+            {date.toDateString()}
+          </Text>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onDateChange}
+            />
+          )}
         </View>
+
+        {/* Time Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Time</Text>
-          <DateTimePicker
-            value={time}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => setTime(selectedTime || time)}
-          />
+          <Text
+            style={styles.datePickerText}
+            onPress={() => setShowTimePicker(true)}
+          >
+            {time.toLocaleTimeString()}
+          </Text>
+          {showTimePicker && (
+            <DateTimePicker
+              value={time}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onTimeChange}
+            />
+          )}
         </View>
+
+        {/* Notes Input */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Additional Notes</Text>
           <TextInput
@@ -65,10 +99,9 @@ const BookAppointmentScreen: React.FC = () => {
           />
         </View>
       </View>
-      <Button
-        title="Confirm Appointment"
-        onPress={handleConfirmAppointment}
-      />
+
+      {/* Confirm Button */}
+      <Button title="Confirm Appointment" onPress={handleConfirmAppointment} />
     </ScrollView>
   );
 };
@@ -111,7 +144,14 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  datePickerText: {
+    fontSize: 16,
+    color: colors.text,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+  },
 });
 
 export default BookAppointmentScreen;
-

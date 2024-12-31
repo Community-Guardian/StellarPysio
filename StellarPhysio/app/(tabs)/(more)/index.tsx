@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '@/utils/colors';
 import { Link } from 'expo-router';
 
 const MoreScreen: React.FC = () => {
@@ -11,6 +11,7 @@ const MoreScreen: React.FC = () => {
   const menuItems = [
     { icon: 'person-outline', title: 'Account Settings', route: '/account-settings' },
     { icon: 'card-outline', title: 'Payment Methods', route: '/payment-methods' },
+    { icon: 'star-outline', title: 'Feedback', route: '/feedback' },
     { icon: 'help-circle-outline', title: 'Help & Support', route: '/help-support' },
     { icon: 'document-text-outline', title: 'Terms & Conditions', route: '/terms-conditions' },
     { icon: 'shield-checkmark-outline', title: 'Privacy Policy', route: '/privacy-policy' },
@@ -19,8 +20,6 @@ const MoreScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>More</Text>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Preferences</Text>
         <View style={styles.preferenceItem}>
@@ -153,3 +152,4 @@ const styles = StyleSheet.create({
 });
 
 export default MoreScreen;
+

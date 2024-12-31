@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '@/utils/colors';
 
 interface Appointment {
   id: string;
@@ -76,7 +76,6 @@ const AppointmentsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Appointments</Text>
       <FlatList
         data={appointments}
         renderItem={renderAppointmentItem}

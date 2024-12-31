@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import Button from '../components/Button';
+import Button from '@/components/Button';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '@/utils/colors';
 
 const ProfileScreen: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -28,7 +28,7 @@ const ProfileScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
         <Image
-          source={require('../assets/images/profile-placeholder.png')}
+          source={require('../../../assets/images/profile-placeholder.png')}
           style={styles.profileImage}
         />
         <TouchableOpacity style={styles.editImageButton}>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../utils/colors';
+import { colors } from '../../utils/colors';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -48,7 +48,7 @@ const LoginScreen: React.FC = () => {
         </View>
       </View>
       <Button title="Login" onPress={handleLogin} />
-      <Link href="/dashboard" asChild>
+      <Link href="/(dashboard)" asChild>
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
