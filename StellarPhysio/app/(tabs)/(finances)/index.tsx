@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert,ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Keyboard, ScrollView, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
 import Button from '@/components/Button';
@@ -76,6 +76,7 @@ const PaymentsScreen: React.FC = () => {
             // Clear inputs
             setMpesaNumber('');
             setAmount('');
+            Keyboard.dismiss();
           }
         }
       ]
@@ -112,7 +113,10 @@ const PaymentsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      style={styles.container}
+    >
       <ScrollView style={styles.scrollContent}>
         <View style={styles.mpesaSection}>
           <Text style={styles.sectionTitle}>Pay with M-Pesa</Text>
@@ -191,15 +195,19 @@ const PaymentsScreen: React.FC = () => {
   
         <View style={styles.historySection}>
           <Text style={styles.sectionTitle}>Payment History</Text>
-          <FlatList
-            data={paymentHistory}
-            renderItem={renderPaymentHistoryItem}
-            keyExtractor={(item) => item.id}
-            nestedScrollEnabled
-          />
+          {paymentHistory.length > 0 ? (
+            <FlatList
+              data={paymentHistory}
+              renderItem={renderPaymentHistoryItem}
+              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <Text style={styles.noHistoryText}>No payment history available</Text>
+          )}
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );  
 };
 
@@ -212,17 +220,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 24,
     paddingHorizontal: 24,
-    flex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 10,
-    paddingHorizontal: 24,
-  },
-  scrollView: {
-    flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
@@ -335,9 +332,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
   },
-  pendingChargesSection: {
-    marginBottom: 24,
-  },
   chargeItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -376,7 +370,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  noHistoryText: {
+    fontSize: 16,
+    color: colors.text,
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
-
-export default PaymentsScreen;
-

@@ -1,12 +1,69 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Switch,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
 import { Link } from 'expo-router';
 
+const PREFERENCES_KEY = 'user_preferences';
+
 const MoreScreen: React.FC = () => {
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = React.useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+
+  // Load preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const savedPreferences = await AsyncStorage.getItem(PREFERENCES_KEY);
+        if (savedPreferences) {
+          const { notificationsEnabled, darkModeEnabled } = JSON.parse(savedPreferences);
+          setNotificationsEnabled(notificationsEnabled);
+          setDarkModeEnabled(darkModeEnabled);
+        } else {
+          // Set default values if no preferences found
+          setNotificationsEnabled(true); // Default as true
+          setDarkModeEnabled(false); // Default as false
+        }
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      }
+    };
+    loadPreferences();
+  }, []); // Empty dependency array to run only on mount
+
+  const savePreferences = async (key: string, value: boolean) => {
+    try {
+      const updatedPreferences = {
+        notificationsEnabled,
+        darkModeEnabled,
+        [key]: value,
+      };
+      await AsyncStorage.setItem(PREFERENCES_KEY, JSON.stringify(updatedPreferences));
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
+  };
+
+  const toggleNotifications = (value: boolean) => {
+    setNotificationsEnabled(value);
+    savePreferences('notificationsEnabled', value);
+    Alert.alert('Notifications', value ? 'Enabled' : 'Disabled');
+  };
+
+  const toggleDarkMode = (value: boolean) => {
+    setDarkModeEnabled(value);
+    savePreferences('darkModeEnabled', value);
+    Alert.alert('Dark Mode', value ? 'Enabled' : 'Disabled');
+  };
 
   const menuItems = [
     { icon: 'person-outline', title: 'Account Settings', route: '/account-settings' },
@@ -26,7 +83,7 @@ const MoreScreen: React.FC = () => {
           <Text style={styles.preferenceText}>Enable Notifications</Text>
           <Switch
             value={notificationsEnabled}
-            onValueChange={setNotificationsEnabled}
+            onValueChange={toggleNotifications}
             trackColor={{ false: colors.lightText, true: colors.primary }}
             thumbColor={notificationsEnabled ? colors.white : colors.background}
           />
@@ -35,7 +92,7 @@ const MoreScreen: React.FC = () => {
           <Text style={styles.preferenceText}>Dark Mode</Text>
           <Switch
             value={darkModeEnabled}
-            onValueChange={setDarkModeEnabled}
+            onValueChange={toggleDarkMode}
             trackColor={{ false: colors.lightText, true: colors.primary }}
             thumbColor={darkModeEnabled ? colors.white : colors.background}
           />
@@ -152,4 +209,3 @@ const styles = StyleSheet.create({
 });
 
 export default MoreScreen;
-

@@ -99,32 +99,6 @@ const DashboardScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
-      <View style={styles.navbar}>
-        <Link href="/dashboard" asChild>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="home" size={24} color={colors.primary} />
-            <Text style={styles.navText}>Home</Text>
-          </TouchableOpacity>
-        </Link>
-        <Link href="/appointments" asChild>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="calendar" size={24} color={colors.text} />
-            <Text style={styles.navText}>Appointments</Text>
-          </TouchableOpacity>
-        </Link>
-        <Link href="/profile" asChild>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="person" size={24} color={colors.text} />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-        </Link>
-        <Link href="/more" asChild>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="menu" size={24} color={colors.text} />
-            <Text style={styles.navText}>More</Text>
-          </TouchableOpacity>
-        </Link>
-      </View>
     </View>
   );
 };
@@ -192,23 +166,6 @@ const styles = StyleSheet.create({
   notificationMessage: {
     fontSize: 14,
     color: colors.lightText,
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.lightText,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 12,
-    color: colors.text,
-    marginTop: 4,
   },
   wellnessTipContainer: {
     backgroundColor: colors.secondary,

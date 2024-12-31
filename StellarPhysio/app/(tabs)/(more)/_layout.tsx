@@ -6,6 +6,7 @@ const MoreScreenLayout = () => {
   return (
     <Stack>
        <Stack.Screen name="index" options={{ headerShown: true,headerTitle: 'More' }}/>
+       <Stack.Screen name="feedback" options={{ headerShown: true,headerTitle: 'Feedback' }}/>
        {/* <Stack.Screen name="profile"  />
        <Stack.Screen name="add-post"  /> */}
 
