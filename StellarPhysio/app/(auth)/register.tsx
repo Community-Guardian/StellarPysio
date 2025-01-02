@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
+import Button from '../../components/Button';
 import { colors } from '../../utils/colors';
+import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { useRouter } from 'expo-router';
 
 const RegistrationScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
@@ -13,10 +14,22 @@ const RegistrationScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [error, setError] = useState('');
+  const { signUp, loading } = useAuth(); // Destructure signUp from AuthContext
+  const router = useRouter()
 
-  const handleRegister = () => {
-    // Implement registration logic here
-    console.log('Register button pressed');
+  const handleRegister = async () => {
+    try {
+      setError(''); // Clear previous errors
+      if (password !== confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+      await signUp(email, password, fullName, 'user'); // Assuming userType is 'user'
+      router.push('/(auth)/login')
+    } catch (error:any) {
+      setError(error.message || 'Registration error');
+      console.error('Registration error:', error);
+    }
   };
 
   return (
@@ -70,6 +83,7 @@ const RegistrationScreen: React.FC = () => {
           onChangeText={setConfirmPassword}
           secureTextEntry={!showPassword}
         />
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
       <View style={styles.termsContainer}>
         <TouchableOpacity onPress={() => setAgreeTerms(!agreeTerms)}>
@@ -84,13 +98,14 @@ const RegistrationScreen: React.FC = () => {
       <Button
         title="Create Account"
         onPress={handleRegister}
-        disabled={!agreeTerms}
+        disabled={!agreeTerms || password !== confirmPassword}
+        loading={loading}
       />
       <View style={styles.loginPrompt}>
         <Text style={styles.loginText}>Already have an account? </Text>
-        <Link href="/login" asChild>
+        <TouchableOpacity onPress={() => console.log('Navigate to login')}>
           <Text style={styles.loginLink}>Login</Text>
-        </Link>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -143,6 +158,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
   },
+  errorText: {
+    color: colors.error,
+    fontSize: 14,
+    marginTop: 8,
+  },
   loginPrompt: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -160,4 +180,3 @@ const styles = StyleSheet.create({
 });
 
 export default RegistrationScreen;
-

@@ -8,18 +8,10 @@ import {
   LOGIN_URL_URL, 
   LOGOUT_URL,
   GET_USER_URL,
-  CREATE_EMERGENCY_CONTACT_URL, // Add this line for the new endpoint
+  CREATE_EMERGENCY_CONTACT_URL, 
   GET_EMERGENCY_CONTACT_URL,
-  UPDATE_EMERGENCY_CONTACT_URL, // Add this line for the new endpoint
-  DELETE_EMERGENCY_CONTACT_URL, // Add this line for the new endpoint
-  CREATE_REPORT_URL,    // Add this line for the new report endpoint
-  GET_REPORTS_URL,      // Add this line for fetching reports
-  UPDATE_REPORT_URL,    // Add this line for updating reports
-  DELETE_REPORT_URL  ,   // Add this line for deleting reports
-  GET_POSTS_URL,
-  GET_COMMENTS_URL,
-  CREATE_COMMENT_URL,
-  GET_REWARDS_URL,
+  UPDATE_EMERGENCY_CONTACT_URL, 
+  DELETE_EMERGENCY_CONTACT_URL, 
 
 } from './apiConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -201,92 +193,5 @@ export const deleteEmergencyContact = async (contactId: string) => {
     return response.data;
   } catch (error) {
     handleApiError(error as AxiosError);
-  }
-};
-// New Report Handlers
-
-export const postReport = async (reportData: FormData) => {
-  try {
-    const response = await api.post(CREATE_REPORT_URL, reportData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // This is automatically set by Axios for FormData, but added here for clarity
-      },
-    });
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-    throw error; // Optionally rethrow the error if you need further handling elsewhere
-  }
-};
-export const getReports = async () => {
-  try {
-    const response = await api.get(GET_REPORTS_URL);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-export const UpdateReport = async (reportId: string, reportData: FormData) => {
-  try {
-    const url = UPDATE_REPORT_URL.replace('{id}', reportId);
-    const response = await api.patch(url, reportData);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-export const DeleteReport = async (reportId: string) => {
-  try {
-    const url = DELETE_REPORT_URL.replace('{id}', reportId);
-    const response = await api.delete(url);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-// api.tsx
-
-// Fetch all posts
-export const getPosts = async () => {
-  try {
-    const response = await api.get(GET_POSTS_URL);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-// Fetch all comments for a specific post
-export const getComments = async (postId: string) => {
-  try {
-    const url = `${GET_COMMENTS_URL}?post=${postId}`;
-    const response = await api.get(url);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-// Create a new comment
-export const createComment = async (commentData: any) => {
-  try {
-    const response = await api.post(CREATE_COMMENT_URL, commentData);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-  }
-};
-
-// Fetch all rewards
-export const getRewards = async () => {
-  try {
-    const response = await api.get(GET_REWARDS_URL);
-    return response.data;
-  } catch (error) {
-    handleApiError(error as AxiosError);
-    throw error;
   }
 };

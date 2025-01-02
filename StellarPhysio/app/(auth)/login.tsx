@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
+import Button from '../../components/Button';
 import { colors } from '../../utils/colors';
-
+import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { useRouter } from 'expo-router';
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleLogin = () => {
-    // Implement login logic here
-    console.log('Login button pressed');
+  const [error, setError] = useState('');
+  const { login, loading } = useAuth(); // Destructure login from AuthContext
+  const router = useRouter()
+  const handleLogin = async () => {
+    try {
+      setError(''); // Clear previous errors
+      await login(email, password);
+      router.push('/(tabs)/(dashboard)')
+    } catch (error) {
+      setError('Invalid email or password');
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -46,18 +54,20 @@ const LoginScreen: React.FC = () => {
             />
           </TouchableOpacity>
         </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
-      <Button title="Login" onPress={handleLogin} />
-      <Link href="/(dashboard)" asChild>
-        <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
-      </Link>
+      <Button title="Login" onPress={handleLogin} loading={loading} />
+      <TouchableOpacity
+        style={styles.forgotPassword}
+        onPress={() => console.log('Navigate to forgot password')}
+      >
+        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+      </TouchableOpacity>
       <View style={styles.registerPrompt}>
         <Text style={styles.registerText}>Don't have an account? </Text>
-        <Link href="/register" asChild>
+        <TouchableOpacity onPress={() => console.log('Navigate to register')}>
           <Text style={styles.registerLink}>Register</Text>
-        </Link>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -100,6 +110,11 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 16,
   },
+  errorText: {
+    color: colors.error,
+    fontSize: 14,
+    marginTop: 8,
+  },
   forgotPassword: {
     alignSelf: 'center',
     marginTop: 16,
@@ -125,4 +140,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-

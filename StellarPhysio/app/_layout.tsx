@@ -8,6 +8,11 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+import { AuthProvider } from '@/context/AuthContext';
+import { PaymentProvider } from '@/context/PaymentContext';
+import { AppointmentProvider } from '@/context/AppointmentContext';
+import { ServicesProvider } from '@/context/ServicesContext';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -29,12 +34,20 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <AuthProvider>
+        <PaymentProvider>
+          <AppointmentProvider>
+            <ServicesProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            </ServicesProvider>
+          </AppointmentProvider>
+        </PaymentProvider>
+      </AuthProvider>
       <StatusBar style="auto" />
     </ThemeProvider>
   );

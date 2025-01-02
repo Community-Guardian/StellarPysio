@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
 import { colors } from '../utils/colors';
 
 interface ButtonProps {
@@ -7,6 +7,7 @@ interface ButtonProps {
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline';
   disabled?: boolean;
+  loading?: boolean; // Add loading prop
   style?: ViewStyle;
   textStyle?: TextStyle;
 }
@@ -16,6 +17,7 @@ const Button: React.FC<ButtonProps> = ({
   onPress, 
   variant = 'primary', 
   disabled = false,
+  loading = false, // Default loading state
   style,
   textStyle
 }) => {
@@ -28,15 +30,19 @@ const Button: React.FC<ButtonProps> = ({
         style
       ]}
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || loading} // Disable button when loading
     >
-      <Text style={[
-        styles.text,
-        styles[`${variant}Text`],
-        textStyle
-      ]}>
-        {title}
-      </Text>
+      {loading ? (
+        <ActivityIndicator color={variant === 'outline' ? colors.primary : colors.white} />
+      ) : (
+        <Text style={[
+          styles.text,
+          styles[`${variant}Text`],
+          textStyle
+        ]}>
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -79,4 +85,3 @@ const styles = StyleSheet.create({
 });
 
 export default Button;
-
