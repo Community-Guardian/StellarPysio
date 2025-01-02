@@ -12,8 +12,10 @@ interface QuickAccessTile {
 }
 
 interface Notification {
+  id: string;
   title: string;
   message: string;
+  read: boolean;
 }
 
 interface WellnessTip {
@@ -29,16 +31,24 @@ interface LastAppointment {
 
 const DashboardScreen: React.FC = () => {
   const quickAccessTiles: QuickAccessTile[] = [
-    { title: 'Book Appointment', icon: 'calendar', screen: 'book_appointment' },
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
+    { title: 'Book Appointment', icon: 'calendar', screen: 'book_appointment' },
     { title: 'Prescriptions & Charges', icon: 'document-text', screen: 'prescriptions-charges' },
   ];
 
-  const notifications: Notification[] = [
-    { title: 'Appointment Reminder', message: 'You have an appointment tomorrow at 2 PM.' },
-    { title: 'New Service', message: 'Try our new sports therapy service!' },
-  ];
+  const [notifications, setNotifications] = useState<Notification[]>([{
+    id: '1',
+    title: 'Appointment Reminder',
+    message: 'You have an appointment tomorrow at 2 PM.',
+    read: false,
+  },
+  {
+    id: '2',
+    title: 'New Service',
+    message: 'Try our new sports therapy service!',
+    read: false,
+  }]);
 
   const [wellnessTip, setWellnessTip] = useState<WellnessTip | null>(null);
   const [lastAppointment, setLastAppointment] = useState<LastAppointment | null>(null);
@@ -56,26 +66,57 @@ const DashboardScreen: React.FC = () => {
     });
   }, []);
 
+  const markAsRead = (id: string) => {
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
+      )
+    );
+  };
+
+  const handleSeeAll = () => {
+    console.log('Navigating to all notifications');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>Welcome, John!</Text>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.tilesContainer}>
-          {quickAccessTiles.map((tile, index) => (
-            <Link key={index} href={`/${tile.screen}`} asChild>
-              <TouchableOpacity style={styles.tile}>
-                <Ionicons name={tile.icon} size={32} color={colors.primary} />
-                <Text style={styles.tileText}>{tile.title}</Text>
-              </TouchableOpacity>
-            </Link>
-          ))}
+        <View>
+          <Text style={styles.quickMenuTitle}>Quick Menu</Text>
+          <View style={styles.tilesContainer}>
+            {quickAccessTiles.map((tile, index) => (
+              <Link key={index} href={`/${tile.screen}`} asChild>
+                <TouchableOpacity style={styles.tile}>
+                  <Ionicons name={tile.icon} size={32} color={colors.primary} />
+                  <Text style={styles.tileText}>{tile.title}</Text>
+                </TouchableOpacity>
+              </Link>
+            ))}
+          </View>
         </View>
         <View style={styles.notificationsContainer}>
-          <Text style={styles.sectionTitle}>Notifications</Text>
-          {notifications.map((notification, index) => (
-            <View key={index} style={styles.notification}>
+          <View style={styles.notificationsHeader}>
+            <Text style={styles.sectionTitle}>Notifications</Text>
+            <Button title="See All" onPress={handleSeeAll} style={styles.seeAllButton} />
+          </View>
+          {notifications.map((notification) => (
+            <View
+              key={notification.id}
+              style={[
+                styles.notification,
+                notification.read && styles.notificationRead,
+              ]}
+            >
               <Text style={styles.notificationTitle}>{notification.title}</Text>
               <Text style={styles.notificationMessage}>{notification.message}</Text>
+              {!notification.read && (
+                <Button
+                  title="Mark as Read"
+                  onPress={() => markAsRead(notification.id)}
+                  style={styles.markAsReadButton}
+                />
+              )}
             </View>
           ))}
         </View>
@@ -121,10 +162,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  quickMenuTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 12,
+  },
   tilesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    marginBottom: 20,
   },
   tile: {
     width: '48%',
@@ -149,14 +197,28 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 10,
   },
+  notificationsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 12,
   },
+  seeAllButton: {
+    alignSelf: 'flex-end',
+  },
   notification: {
     marginBottom: 12,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: colors.background,
+  },
+  notificationRead: {
+    backgroundColor: colors.background,
   },
   notificationTitle: {
     fontSize: 16,
@@ -166,6 +228,10 @@ const styles = StyleSheet.create({
   notificationMessage: {
     fontSize: 14,
     color: colors.lightText,
+  },
+  markAsReadButton: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
   },
   wellnessTipContainer: {
     backgroundColor: colors.secondary,
@@ -195,4 +261,3 @@ const styles = StyleSheet.create({
 });
 
 export default DashboardScreen;
-

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
+import { useNavigation } from '@react-navigation/native'; // Import navigation hook
 
 interface Service {
   id: string;
@@ -11,6 +12,7 @@ interface Service {
 
 const ServicesScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
 
   const services: Service[] = [
     { id: '1', name: 'Manual Therapy', description: 'Hands-on treatment to manipulate joints and soft tissue.' },
@@ -23,6 +25,10 @@ const ServicesScreen: React.FC = () => {
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleBookNow = (service: Service) => {
+    navigation.navigate('book_appointment', { selectedService: service });
+  };
+
   const renderServiceItem = ({ item }: { item: Service }) => (
     <View style={styles.serviceItem}>
       <Text style={styles.serviceName}>{item.name}</Text>
@@ -31,7 +37,10 @@ const ServicesScreen: React.FC = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Learn More</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.bookButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.bookButton]}
+          onPress={() => handleBookNow(item)}
+        >
           <Text style={styles.buttonText}>Book Now</Text>
         </TouchableOpacity>
       </View>

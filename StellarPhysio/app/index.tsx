@@ -8,7 +8,7 @@ const WelcomeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/images/splash-icon.png')}
+        source={require('../assets/images/logo.webp')}
         style={styles.logo}
       />
       <Text style={styles.tagline}>

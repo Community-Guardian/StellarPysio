@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # Third party libraries
     'jazzmin',
     'corsheaders',
+    'django_daraja',
     'rest_framework_simplejwt',
     'django.contrib.sites',
     'phonenumber_field',
@@ -58,6 +59,9 @@ INSTALLED_APPS = [
     
     # My apps
     'userManager',
+    'appointments',
+    'services',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -215,6 +219,21 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # Default sender email address
 
+# Mpesa credentials
+MPESA_CONSUMER_KEY = config('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET = config('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE = config('MPESA_SHORTCODE')
+MPESA_EXPRESS_SHORTCODE = config('MPESA_EXPRESS_SHORTCODE')
+MPESA_PASSKEY = config('MPESA_PASSKEY')
+MPESA_INITIATOR_USERNAME = config('MPESA_INITIATOR_USERNAME')
+MPESA_INITIATOR_SECURITY_CREDENTIAL = config('MPESA_INITIATOR_SECURITY_CREDENTIAL')
+MPESA_ENVIRONMENT = 'sandbox'
+# Pusher Settings
+PUSHER_APP_ID = '1763106'
+PUSHER_KEY = 'f238dc2ebfb0118cdc08'
+PUSHER_SECRET = 'cc71326f6f4fdf574e84'
+PUSHER_CLUSTER = 'mt1'
+
 # REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -230,15 +249,15 @@ REST_FRAMEWORK = {
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS = {
-    "site_title": "GoldenCare Backend",
-    "site_header": "GoldenCare Guardian Backend",
-    "site_brand": "CG ",
+    "site_title": "StellarPhysio Backend",
+    "site_header": "StellarPhysio Guardian Backend",
+    "site_brand": "SP",
     # "site_icon": "images/favicon.png",
     # Add your own branding here
     "site_logo": None,
-    "welcome_sign": "Welcome to the GoldenCare Backend",
+    "welcome_sign": "Welcome to the StellarPhysio Backend",
     # Copyright on the footer
-    "copyright": "GoldenCare Backend",
+    "copyright": "StellarPhysio Backend",
     # "user_avatar": None,
     ############
     # Top Menu #
@@ -246,7 +265,7 @@ JAZZMIN_SETTINGS = {
     # Links to put along the top menu
     "topmenu_links": [
         # Url that gets reversed (Permissions can be added)
-        {"name": "GoldenCare", "url": "home", "permissions": ["auth.view_user"]},
+        {"name": "StellarPhysio", "url": "home", "permissions": ["auth.view_user"]},
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
     ],

@@ -4,15 +4,19 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from '@/components/Button';
 import { colors } from '@/utils/colors';
-
+import { useRoute ,RouteProp } from '@react-navigation/native'; // Import route hook
+type RouteParams = {
+  selectedService?: { name: string; description: string };
+};
 const BookAppointmentScreen: React.FC = () => {
-  const [service, setService] = useState('');
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [notes, setNotes] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
+  const route = useRoute<RouteProp<{ params: RouteParams }>>(); // Type-safe usage
+  const { selectedService } = route.params || {}; // Retrieve the passed parameter
+  const [service, setService] = useState(selectedService?.name || ''); // Use selectedService as default
   const handleConfirmAppointment = () => {
     console.log('Appointment confirmed');
     console.log({ service, date, time, notes });
@@ -41,9 +45,9 @@ const BookAppointmentScreen: React.FC = () => {
               style={styles.picker}
             >
               <Picker.Item label="Select a service" value="" />
-              <Picker.Item label="Manual Therapy" value="manual_therapy" />
-              <Picker.Item label="Sports Therapy" value="sports_therapy" />
-              <Picker.Item label="Rehabilitation" value="rehabilitation" />
+              <Picker.Item label="Manual Therapy" value="Manual Therapy" />
+              <Picker.Item label="Sports Therapy" value="Sports Therapy" />
+              <Picker.Item label="Rehabilitation" value="Rehabilitation" />
             </Picker>
           </View>
         </View>

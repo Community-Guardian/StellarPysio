@@ -16,8 +16,10 @@ import { Link } from 'expo-router';
 const PREFERENCES_KEY = 'user_preferences';
 
 const MoreScreen: React.FC = () => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [preferences, setPreferences] = useState({
+    notificationsEnabled: true,
+    darkModeEnabled: false,
+  });
 
   // Load preferences on mount
   useEffect(() => {
@@ -25,44 +27,24 @@ const MoreScreen: React.FC = () => {
       try {
         const savedPreferences = await AsyncStorage.getItem(PREFERENCES_KEY);
         if (savedPreferences) {
-          const { notificationsEnabled, darkModeEnabled } = JSON.parse(savedPreferences);
-          setNotificationsEnabled(notificationsEnabled);
-          setDarkModeEnabled(darkModeEnabled);
-        } else {
-          // Set default values if no preferences found
-          setNotificationsEnabled(true); // Default as true
-          setDarkModeEnabled(false); // Default as false
+          setPreferences(JSON.parse(savedPreferences));
         }
       } catch (error) {
         console.error('Error loading preferences:', error);
       }
     };
     loadPreferences();
-  }, []); // Empty dependency array to run only on mount
+  }, []);
 
-  const savePreferences = async (key: string, value: boolean) => {
+  const updatePreferences = async (key: string, value: boolean) => {
     try {
-      const updatedPreferences = {
-        notificationsEnabled,
-        darkModeEnabled,
-        [key]: value,
-      };
+      const updatedPreferences = { ...preferences, [key]: value };
+      setPreferences(updatedPreferences);
       await AsyncStorage.setItem(PREFERENCES_KEY, JSON.stringify(updatedPreferences));
+      Alert.alert('Preference Updated', `${key === 'notificationsEnabled' ? 'Notifications' : 'Dark Mode'} ${value ? 'Enabled' : 'Disabled'}`);
     } catch (error) {
       console.error('Error saving preferences:', error);
     }
-  };
-
-  const toggleNotifications = (value: boolean) => {
-    setNotificationsEnabled(value);
-    savePreferences('notificationsEnabled', value);
-    Alert.alert('Notifications', value ? 'Enabled' : 'Disabled');
-  };
-
-  const toggleDarkMode = (value: boolean) => {
-    setDarkModeEnabled(value);
-    savePreferences('darkModeEnabled', value);
-    Alert.alert('Dark Mode', value ? 'Enabled' : 'Disabled');
   };
 
   const menuItems = [
@@ -77,28 +59,30 @@ const MoreScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
+      {/* Preferences Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Preferences</Text>
         <View style={styles.preferenceItem}>
           <Text style={styles.preferenceText}>Enable Notifications</Text>
           <Switch
-            value={notificationsEnabled}
-            onValueChange={toggleNotifications}
+            value={preferences.notificationsEnabled}
+            onValueChange={(value) => updatePreferences('notificationsEnabled', value)}
             trackColor={{ false: colors.lightText, true: colors.primary }}
-            thumbColor={notificationsEnabled ? colors.white : colors.background}
+            thumbColor={preferences.notificationsEnabled ? colors.white : colors.background}
           />
         </View>
         <View style={styles.preferenceItem}>
           <Text style={styles.preferenceText}>Dark Mode</Text>
           <Switch
-            value={darkModeEnabled}
-            onValueChange={toggleDarkMode}
+            value={preferences.darkModeEnabled}
+            onValueChange={(value) => updatePreferences('darkModeEnabled', value)}
             trackColor={{ false: colors.lightText, true: colors.primary }}
-            thumbColor={darkModeEnabled ? colors.white : colors.background}
+            thumbColor={preferences.darkModeEnabled ? colors.white : colors.background}
           />
         </View>
       </View>
 
+      {/* Loyalty Program Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Loyalty Program</Text>
         <View style={styles.loyaltyCard}>
@@ -111,6 +95,7 @@ const MoreScreen: React.FC = () => {
         </View>
       </View>
 
+      {/* Menu Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Menu</Text>
         {menuItems.map((item, index) => (
@@ -131,13 +116,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 24,
+    padding: 16,
   },
   section: {
     marginBottom: 24,

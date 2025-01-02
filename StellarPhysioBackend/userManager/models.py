@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.contrib.auth.hashers import make_password
@@ -172,7 +173,14 @@ class Provider(CustomUser):
     
     # New fields for providers to manage patients
     patients = models.ManyToManyField(Patient, blank=True, related_name='assigned_providers')
-    
+    @property
+    def is_available(self):
+        return not self.provider_appointments.filter(
+            date_time__gte=timezone.now()
+        ).exists()
+
+    def __str__(self):
+        return f"Provider: {self.user.username}"
     class Meta:
         verbose_name = "Provider"
         verbose_name_plural = "Providers"
