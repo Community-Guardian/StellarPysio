@@ -1,25 +1,50 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Alert, FlatList } from 'react-native';
 import { usePayments } from '@/context/PaymentContext';
+import { useServices } from '@/context/ServicesContext';
 import Button from '@/components/Button';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+
+interface Service {
+  id: number;
+  name: string;
+  serviceType: string; // Flattened from "service_type.name"
+  price: string;
+  description: string;
+  isActive: boolean;
+}
 
 const PayNowScreen: React.FC = () => {
   const { createPaymentIntent, loading } = usePayments();
+  const { services, fetchServices } = useServices();
   const [mpesaNumber, setMpesaNumber] = useState('');
   const [amount, setAmount] = useState('');
+  const [selectedService, setSelectedService] = useState<Service | null>(null); // service structure
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failure'>('idle');
   const router = useRouter();
+  const { serviceId } = useLocalSearchParams(); // Assuming serviceId is passed as query param
+
+  useEffect(() => {
+    fetchServices(); // Fetch services on mount
+  }, [fetchServices]);
+
+  useEffect(() => {
+    if (serviceId) {
+      const service = services.find((s) => s.id === parseInt(serviceId as string));
+      setSelectedService(service || null);
+      setAmount(service?.price || '0');
+    }
+  }, [serviceId, services]);
 
   const handlePayment = async () => {
-    if (!mpesaNumber || !amount) {
-      Alert.alert('Error', 'Please enter both M-Pesa number and amount');
+    if (!selectedService || !mpesaNumber || !amount) {
+      Alert.alert('Error', 'Please select a service, and enter M-Pesa number and amount.');
       return;
     }
 
     try {
-      await createPaymentIntent(mpesaNumber, amount);
+      await createPaymentIntent(selectedService.id.toString(), mpesaNumber);
       setPaymentStatus('success');
       setMpesaNumber('');
       setAmount('');
@@ -51,47 +76,52 @@ const PayNowScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView style={styles.scrollView}>
-        <Text style={styles.title}>Pay Now</Text>
-
-        {renderPaymentStatus()}
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="M-Pesa Number"
-            value={mpesaNumber}
-            onChangeText={setMpesaNumber}
-            keyboardType="phone-pad"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Amount (KES)"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <Button
-          title="Pay Now"
-          onPress={handlePayment}
-          disabled={loading || !mpesaNumber || !amount}
-          style={styles.button}
-        />
-
-        <Button
-          title="Back to Payments"
-          onPress={() => router.back()}
-          variant="outline"
-          style={styles.button}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <FlatList
+        data={selectedService ? [selectedService] : []} // Only render selected service if available
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.selectedService}>
+            <Text style={styles.selectedServiceText}>Selected Service: {item.name}</Text>
+          </View>
+        )}
+        ListHeaderComponent={
+          <View style={styles.formContainer}>
+            {renderPaymentStatus()}
+            <TextInput
+              style={styles.input}
+              placeholder="M-Pesa Number"
+              value={mpesaNumber}
+              onChangeText={setMpesaNumber}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Amount (KES)"
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+            />
+          </View>
+        }
+        ListFooterComponent={
+          <View style={styles.buttonsContainer}>
+            <Button
+              title="Pay Now"
+              onPress={handlePayment}
+              disabled={loading || !mpesaNumber || !amount || !selectedService}
+              style={styles.button}
+            />
+            <Button
+              title="Back to Payments"
+              onPress={() => router.back()}
+              variant="outline"
+              style={styles.button}
+            />
+          </View>
+        }
+      />
+    </View>
   );
 };
 
@@ -99,16 +129,33 @@ const styles = {
   container: {
     flex: 1,
     backgroundColor: '#f8f8f8',
+    padding: 16,
   },
-  scrollView: {
-    flex: 1,
-    padding: 24,
+  formContainer: {
+    marginBottom: 24,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 24,
+  },
+  selectedService: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  selectedServiceText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    fontSize: 16,
   },
   successContainer: {
     backgroundColor: 'green',
@@ -136,15 +183,8 @@ const styles = {
     fontWeight: 'bold',
     marginLeft: 8,
   },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    fontSize: 16,
+  buttonsContainer: {
+    paddingHorizontal: 16,
   },
   button: {
     marginBottom: 16,

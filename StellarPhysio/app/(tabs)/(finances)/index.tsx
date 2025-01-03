@@ -12,16 +12,38 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { usePayments } from '@/context/PaymentContext';
 import { colors } from '@/utils/colors';
 import Button from '@/components/Button';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useRouter } from 'expo-router';
+interface Payment {
+  id: string;
+  service_id: number;
+  service: {
+    id: number;
+    name: string;
+    service_type: {
+      id: number;
+      name: string;
+    };
+    price: string;
+    description: string;
+    is_active: boolean;
+  };
+  service_type: string;
+  payment_method: string;
+  result_code: string;
+  result_desc: string;
+  payment_status: string;
+  amount: string;
+  transaction_id: string;
+  created_at: string;
+  updated_at: string;
+  user: string;
+}
 const PaymentsScreen: React.FC = () => {
-  const { createPaymentIntent, fetchPayments, payments, loading } = usePayments();
-
-  const [amount, setAmount] = useState('');
+  const { fetchPayments, payments, loading } = usePayments();
+  const router = useRouter();
   const [promoCode, setPromoCode] = useState('');
   const [loyaltyPoints, setLoyaltyPoints] = useState(150);
 
@@ -29,30 +51,13 @@ const PaymentsScreen: React.FC = () => {
     fetchPayments(); // Fetch payments on component mount
   }, []);
 
-  const handlePayment = async () => {
-    if (!amount) {
-      Alert.alert('Error', 'Please enter the amount');
-      return;
-    }
-
-    try {
-      await createPaymentIntent(amount);
-      Alert.alert('Success', 'Payment processed successfully');
-      setLoyaltyPoints((prevPoints) => prevPoints + Math.floor(parseFloat(amount) / 10));
-      setAmount('');
-      Keyboard.dismiss();
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      Alert.alert('Error', 'Failed to process payment');
-    }
-  };
-
+  
   const applyPromoCode = () => {
     Alert.alert('Success', 'Promo code applied successfully. You get 10% off on your next payment!');
     setPromoCode('');
   };
 
-  const renderPaymentHistoryItem = ({ item }: { item: PaymentHistory }) => (
+  const renderPaymentHistoryItem = ({ item }: { item: Payment }) => (
     <View style={styles.historyItem}>
       <View>
         <Text style={styles.historyDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
@@ -68,18 +73,6 @@ const PaymentsScreen: React.FC = () => {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView style={styles.scrollContent}>
-        <View style={styles.mpesaSection}>
-          <Text style={styles.sectionTitle}>Pay with M-Pesa</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Amount (KES)"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-          />
-          <Button title="Pay Now" onPress={handlePayment} style={styles.payButton} loading={loading} />
-        </View>
-
         <View style={styles.pendingChargesSection}>
           <Text style={styles.sectionTitle}>Pending Charges</Text>
           {payments.filter((payment) => payment.payment_status === 'pending').map((charge) => (
@@ -93,7 +86,7 @@ const PaymentsScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.payNowButton}
                   onPress={() => {
-                    setAmount(charge.amount.toString());
+                    router.push(`/(tabs)/(finances)/pay_now?serviceId=${charge.service_id}`);
                   }}
                 >
                   <Text style={styles.payNowButtonText}>Pay Now</Text>

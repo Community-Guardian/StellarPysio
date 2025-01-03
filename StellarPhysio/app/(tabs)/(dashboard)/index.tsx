@@ -29,7 +29,7 @@ interface LastAppointment {
 }
 
 const DashboardScreen: React.FC = () => {
-  const { user } = useAuth()
+  const { user } = useAuth()  
   const quickAccessTiles: QuickAccessTile[] = [
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
@@ -78,7 +78,7 @@ const DashboardScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>Welcome, {user?.details?.usernamer}!</Text>
+      <Text style={styles.greeting}>Welcome, {user?.details?.username}!</Text>
       <ScrollView style={styles.scrollView}>
         <View>
           <Text style={styles.quickMenuTitle}>Quick Menu</Text>

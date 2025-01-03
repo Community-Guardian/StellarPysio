@@ -82,7 +82,7 @@ export const getPayments = async () => {
 };
 export const createMpesaPaymentIntent = async (serviceId: string, phoneNumber: string) => {
   try {
-    const response = await api.post(CREATE_MPESA_PAYMENT_INTENT_URL, { serviceId, phoneNumber });
+    const response = await api.post(CREATE_MPESA_PAYMENT_INTENT_URL, { serviceId, phone_number:phoneNumber });
     return response.data;
   } catch (error) {
     handleApiError(error as AxiosError);
