@@ -1,90 +1,53 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Keyboard, ScrollView, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Keyboard,
+  ScrollView,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { usePayments } from '@/context/PaymentContext';
 import { colors } from '@/utils/colors';
 import Button from '@/components/Button';
-
-interface PaymentHistory {
-  id: string;
-  date: string;
-  amount: number;
-  service: string;
-}
-
-interface FavoriteNumber {
-  id: string;
-  name: string;
-  number: string;
-}
-
-interface PendingCharge {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-}
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PaymentsScreen: React.FC = () => {
-  const [mpesaNumber, setMpesaNumber] = useState('');
+  const { createPaymentIntent, fetchPayments, payments, loading } = usePayments();
+
   const [amount, setAmount] = useState('');
   const [promoCode, setPromoCode] = useState('');
   const [loyaltyPoints, setLoyaltyPoints] = useState(150);
 
-  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([
-    { id: '1', date: '2023-05-01', amount: 2500, service: 'Manual Therapy' },
-    { id: '2', date: '2023-04-15', amount: 3000, service: 'Sports Therapy' },
-    { id: '3', date: '2023-03-28', amount: 2000, service: 'Rehabilitation' },
-  ]);
+  useEffect(() => {
+    fetchPayments(); // Fetch payments on component mount
+  }, []);
 
-  const [favoriteNumbers, setFavoriteNumbers] = useState<FavoriteNumber[]>([
-    { id: '1', name: 'Personal', number: '0712345678' },
-    { id: '2', name: 'Work', number: '0723456789' },
-  ]);
-
-  const [pendingCharges, setPendingCharges] = useState<PendingCharge[]>([
-    { id: '1', date: '2023-05-10', description: 'Consultation Fee', amount: 1500 },
-    { id: '2', date: '2023-05-12', description: 'X-Ray Test', amount: 3000 },
-  ]);
-
-  const handlePayment = () => {
-    if (!mpesaNumber || !amount) {
-      Alert.alert('Error', 'Please enter both M-Pesa number and amount');
+  const handlePayment = async () => {
+    if (!amount) {
+      Alert.alert('Error', 'Please enter the amount');
       return;
     }
 
-    // Simulate payment processing
-    Alert.alert(
-      'Payment Confirmation',
-      `Confirm payment of KES ${amount} to StellarPhysio using M-Pesa number ${mpesaNumber}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Confirm', 
-          onPress: () => {
-            // Simulate successful payment
-            Alert.alert('Success', 'Payment processed successfully');
-            // Add to payment history
-            const newPayment: PaymentHistory = {
-              id: (paymentHistory.length + 1).toString(),
-              date: new Date().toISOString().split('T')[0],
-              amount: parseFloat(amount),
-              service: 'Recent Service',
-            };
-            setPaymentHistory([newPayment, ...paymentHistory]);
-            // Update loyalty points (1 point per 10 KES spent)
-            setLoyaltyPoints(prevPoints => prevPoints + Math.floor(parseFloat(amount) / 10));
-            // Clear inputs
-            setMpesaNumber('');
-            setAmount('');
-            Keyboard.dismiss();
-          }
-        }
-      ]
-    );
+    try {
+      await createPaymentIntent(amount);
+      Alert.alert('Success', 'Payment processed successfully');
+      setLoyaltyPoints((prevPoints) => prevPoints + Math.floor(parseFloat(amount) / 10));
+      setAmount('');
+      Keyboard.dismiss();
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      Alert.alert('Error', 'Failed to process payment');
+    }
   };
 
   const applyPromoCode = () => {
-    // Simulate promo code application
     Alert.alert('Success', 'Promo code applied successfully. You get 10% off on your next payment!');
     setPromoCode('');
   };
@@ -92,41 +55,21 @@ const PaymentsScreen: React.FC = () => {
   const renderPaymentHistoryItem = ({ item }: { item: PaymentHistory }) => (
     <View style={styles.historyItem}>
       <View>
-        <Text style={styles.historyDate}>{item.date}</Text>
-        <Text style={styles.historyService}>{item.service}</Text>
+        <Text style={styles.historyDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
+        <Text style={styles.historyService}>{item.service.name}</Text>
       </View>
-      <Text style={styles.historyAmount}>KES {item.amount}</Text>
+      <View>
+        <Text style={styles.historyAmount}>KES {item.amount}</Text>
+        <Text style={styles.historyAmount}>{item.payment_status}</Text>
+      </View>
     </View>
   );
 
-  const renderFavoriteNumber = ({ item }: { item: FavoriteNumber }) => (
-    <TouchableOpacity 
-      style={styles.favoriteItem} 
-      onPress={() => setMpesaNumber(item.number)}
-    >
-      <Ionicons name="person-circle-outline" size={24} color={colors.primary} />
-      <View style={styles.favoriteInfo}>
-        <Text style={styles.favoriteName}>{item.name}</Text>
-        <Text style={styles.favoriteNumber}>{item.number}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView style={styles.scrollContent}>
         <View style={styles.mpesaSection}>
           <Text style={styles.sectionTitle}>Pay with M-Pesa</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="M-Pesa Number"
-            value={mpesaNumber}
-            onChangeText={setMpesaNumber}
-            keyboardType="phone-pad"
-          />
           <TextInput
             style={styles.input}
             placeholder="Amount (KES)"
@@ -134,23 +77,22 @@ const PaymentsScreen: React.FC = () => {
             onChangeText={setAmount}
             keyboardType="numeric"
           />
-          <Button title="Pay Now" onPress={handlePayment} style={styles.payButton} />
+          <Button title="Pay Now" onPress={handlePayment} style={styles.payButton} loading={loading} />
         </View>
-  
+
         <View style={styles.pendingChargesSection}>
           <Text style={styles.sectionTitle}>Pending Charges</Text>
-          {pendingCharges.map((charge) => (
+          {payments.filter((payment) => payment.payment_status === 'pending').map((charge) => (
             <View key={charge.id} style={styles.chargeItem}>
               <View>
-                <Text style={styles.chargeDate}>{charge.date}</Text>
-                <Text style={styles.chargeDescription}>{charge.description}</Text>
+                <Text style={styles.chargeDate}>{new Date(charge.created_at).toLocaleDateString()}</Text>
+                <Text style={styles.chargeDescription}>{charge.service.name}</Text>
               </View>
               <View style={styles.chargeAmountContainer}>
                 <Text style={styles.chargeAmount}>KES {charge.amount}</Text>
                 <TouchableOpacity
                   style={styles.payNowButton}
                   onPress={() => {
-                    setMpesaNumber('');
                     setAmount(charge.amount.toString());
                   }}
                 >
@@ -160,24 +102,13 @@ const PaymentsScreen: React.FC = () => {
             </View>
           ))}
         </View>
-  
-        <View style={styles.favoriteNumbersSection}>
-          <Text style={styles.sectionTitle}>Favorite Numbers</Text>
-          <FlatList
-            data={favoriteNumbers}
-            renderItem={renderFavoriteNumber}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-  
+
         <View style={styles.loyaltySection}>
           <Text style={styles.sectionTitle}>Loyalty Points</Text>
           <Text style={styles.loyaltyPoints}>{loyaltyPoints} points</Text>
           <Text style={styles.loyaltyInfo}>Earn 1 point for every 10 KES spent</Text>
         </View>
-  
+
         <View style={styles.promoSection}>
           <Text style={styles.sectionTitle}>Promo Code</Text>
           <View style={styles.promoInputContainer}>
@@ -192,12 +123,12 @@ const PaymentsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
-  
+
         <View style={styles.historySection}>
           <Text style={styles.sectionTitle}>Payment History</Text>
-          {paymentHistory.length > 0 ? (
+          {payments.length > 0 ? (
             <FlatList
-              data={paymentHistory}
+              data={payments}
               renderItem={renderPaymentHistoryItem}
               keyExtractor={(item) => item.id}
               showsVerticalScrollIndicator={false}
@@ -208,7 +139,7 @@ const PaymentsScreen: React.FC = () => {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  );  
+  );
 };
 
 const styles = StyleSheet.create({
@@ -240,28 +171,46 @@ const styles = StyleSheet.create({
   payButton: {
     marginTop: 12,
   },
-  favoriteNumbersSection: {
+  pendingChargesSection: {
     marginBottom: 24,
   },
-  favoriteItem: {
+  chargeItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: colors.white,
     borderRadius: 8,
     padding: 12,
-    marginRight: 12,
+    marginBottom: 8,
   },
-  favoriteInfo: {
-    marginLeft: 12,
+  chargeDate: {
+    fontSize: 14,
+    color: colors.lightText,
   },
-  favoriteName: {
+  chargeDescription: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.text,
   },
-  favoriteNumber: {
-    fontSize: 14,
-    color: colors.lightText,
+  chargeAmountContainer: {
+    alignItems: 'flex-end',
+  },
+  chargeAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 4,
+  },
+  payNowButton: {
+    backgroundColor: colors.secondary,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  payNowButtonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   loyaltySection: {
     backgroundColor: colors.primary,
@@ -332,44 +281,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
   },
-  chargeItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-  },
-  chargeDate: {
-    fontSize: 14,
-    color: colors.lightText,
-  },
-  chargeDescription: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
-  },
-  chargeAmountContainer: {
-    alignItems: 'flex-end',
-  },
-  chargeAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  payNowButton: {
-    backgroundColor: colors.secondary,
-    borderRadius: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  payNowButtonText: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
   noHistoryText: {
     fontSize: 16,
     color: colors.text,
@@ -377,3 +288,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+export default PaymentsScreen;

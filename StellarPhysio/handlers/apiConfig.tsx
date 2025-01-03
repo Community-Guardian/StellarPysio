@@ -1,10 +1,10 @@
 // Base URL configurations
-// const BASE_URL = 'http://192.168.0.105:8000'; // Update this as per your environment
-const BASE_URL = 'http://127.0.0.1:8000'; // Update this as per your environment
+const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environment
+// const BASE_URL = 'http://127.0.0.1:8000'; // Update this as per your environment
 
 // User endpoints
-export const GET_INDIVIDUAL_URL = `${BASE_URL}/individuals/pk`;
-export const UPDATE_INDIVIDUAL_URL = `${BASE_URL}/individuals/pk/`;
+export const GET_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk`;
+export const UPDATE_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk/`;
 export const SIGN_UP_URL = `${BASE_URL}/register/`;
 export const REFRESH_TOKEN = `${BASE_URL}/token/refresh/`;
 export const LOGIN_URL_URL = `${BASE_URL}/login/`;
@@ -19,6 +19,7 @@ export const DELETE_EMERGENCY_CONTACT_URL = `${BASE_URL}/emergency-contacts/{id}
 export const CREATE_MPESA_PAYMENT_INTENT_URL = `${BASE_URL}/mpesa/create/`;
 export const MPESA_CALLBACK_URL = `${BASE_URL}/callback/`;
 export const REFUND_PAYMENT_URL = `${BASE_URL}/refund/`;
+export const PAYMENTS_URL = `${BASE_URL}/payments/`;
 
 //  endpoints for Appointment Service
 export const APPOINTMENTS_URL = `${BASE_URL}/appointments/`;

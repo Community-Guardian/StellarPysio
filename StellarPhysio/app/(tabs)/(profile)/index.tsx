@@ -1,34 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Button from '@/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
+import { useAuth } from '@/context/AuthContext';
 
 const ProfileScreen: React.FC = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [fullName, setFullName] = useState('John Doe');
-  const [email, setEmail] = useState('johndoe@example.com');
-  const [phone, setPhone] = useState('+1 234 567 8900');
+  const [fullName, setFullName] = useState(user?.details?.first_name || '');
+  const [email, setEmail] = useState(user?.details?.email || '');
+  const [phone, setPhone] = useState(user?.details?.contact_number || '');
 
-  const handleEditProfile = () => {
-    setIsEditing(!isEditing);
-  };
+  useEffect(() => {
+    if (user) {
+      setFullName(`${user.details.first_name} ${user.details.last_name}`);
+      setEmail(user.details.email);
+      setPhone(user.details.contact_number || '');
+    }
+  }, [user]);
 
-  const handleSaveProfile = () => {
-    // Implement save profile logic here
-    setIsEditing(false);
-  };
+  const handleSaveProfile = async () => {
+    try {
+      const [firstName, ...lastNameParts] = fullName.split(' ');
+      const lastName = lastNameParts.join(' ');
+      const updatedData = { first_name: firstName, last_name: lastName, email, contact_number: phone };
 
-  const handleChangePassword = () => {
-    // Implement change password navigation or modal here
-    console.log('Change password pressed');
+      await updateUser(updatedData);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
         <Image
-          source={require('../../../assets/images/profile-placeholder.png')}
+          source={{ uri: user?.details?.image || 'https://via.placeholder.com/120' }}
           style={styles.profileImage}
         />
         <TouchableOpacity style={styles.editImageButton}>
@@ -77,13 +86,7 @@ const ProfileScreen: React.FC = () => {
       </View>
       <Button
         title={isEditing ? "Save Profile" : "Edit Profile"}
-        onPress={isEditing ? handleSaveProfile : handleEditProfile}
-      />
-      <Button
-        title="Change Password"
-        onPress={handleChangePassword}
-        variant="outline"
-        style={styles.changePasswordButton}
+        onPress={isEditing ? handleSaveProfile : () => setIsEditing(true)}
       />
     </View>
   );
@@ -134,10 +137,6 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.lightText,
     paddingVertical: 4,
   },
-  changePasswordButton: {
-    marginTop: 16,
-  },
 });
 
 export default ProfileScreen;
-

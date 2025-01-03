@@ -65,7 +65,7 @@ const LoginScreen: React.FC = () => {
       </TouchableOpacity>
       <View style={styles.registerPrompt}>
         <Text style={styles.registerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => console.log('Navigate to register')}>
+        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
           <Text style={styles.registerLink}>Register</Text>
         </TouchableOpacity>
       </View>

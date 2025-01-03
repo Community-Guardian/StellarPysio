@@ -29,7 +29,7 @@ class Service(models.Model):
         verbose_name = _('Service')
         verbose_name_plural = _('Services')
 class Receipt(models.Model):
-    order = models.ForeignKey(Service, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

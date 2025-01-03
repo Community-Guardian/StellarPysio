@@ -7,7 +7,6 @@ import { useAuth } from '../../context/AuthContext'; // Import useAuth
 import { useRouter } from 'expo-router';
 
 const RegistrationScreen: React.FC = () => {
-  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +23,7 @@ const RegistrationScreen: React.FC = () => {
       if (password !== confirmPassword) {
         throw new Error('Passwords do not match');
       }
-      await signUp(email, password, fullName, 'user'); // Assuming userType is 'user'
+      await signUp(email, password, confirmPassword, 'patient'); // Assuming userType is 'user'
       router.push('/(auth)/login')
     } catch (error:any) {
       setError(error.message || 'Registration error');
@@ -33,15 +32,9 @@ const RegistrationScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          value={fullName}
-          onChangeText={setFullName}
-        />
         <TextInput
           style={styles.input}
           placeholder="Email Address"
@@ -49,13 +42,6 @@ const RegistrationScreen: React.FC = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
         />
         <View style={styles.passwordContainer}>
           <TextInput
@@ -101,13 +87,14 @@ const RegistrationScreen: React.FC = () => {
         disabled={!agreeTerms || password !== confirmPassword}
         loading={loading}
       />
+      <Text style={styles.termsText}>Kindly ensure passwords match</Text>
       <View style={styles.loginPrompt}>
         <Text style={styles.loginText}>Already have an account? </Text>
         <TouchableOpacity onPress={() => console.log('Navigate to login')}>
           <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -116,12 +103,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: 24,
+    justifyContent: 'center',
+
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
     marginBottom: 24,
+    marginTop: 40,
   },
   inputContainer: {
     marginBottom: 24,

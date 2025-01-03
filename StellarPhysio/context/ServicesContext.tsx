@@ -7,8 +7,17 @@ import {
 } from '@/handlers/servicesManager'; // Services manager API functions
 
 // Define the shape of ServicesContext
+interface Service {
+  id: number;
+  name: string;
+  serviceType: string; // Flattened from "service_type.name"
+  price: string;
+  description: string;
+  isActive: boolean;
+}
+
 interface ServicesContextData {
-  services: any[];
+  services: Service[];
   loading: boolean;
   addService: (serviceData: any) => Promise<void>;
   updateService: (serviceId: string, updatedData: any) => Promise<void>;
@@ -33,14 +42,23 @@ const ServicesContext = createContext<ServicesContextData>({
 
 // ServicesProvider component
 export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) => {
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchServices = async () => {
     try {
       setLoading(true);
       const response = await getServices();
-      setServices(response);
+      // Map API response to match the Service interface
+      const mappedServices = response.map((service: any) => ({
+        id: service.id,
+        name: service.name,
+        serviceType: service.service_type.name, // Flattening nested property
+        price: service.price,
+        description: service.description,
+        isActive: service.is_active,
+      }));
+      setServices(mappedServices);
     } catch (error) {
       console.error('Error fetching services:', error);
     } finally {
@@ -92,7 +110,16 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
   }, []);
 
   return (
-    <ServicesContext.Provider value={{ services, loading, addService, updateService: updateServiceDetails, deleteService: removeService, fetchServices }}>
+    <ServicesContext.Provider
+      value={{
+        services,
+        loading,
+        addService,
+        updateService: updateServiceDetails,
+        deleteService: removeService,
+        fetchServices,
+      }}
+    >
       {children}
     </ServicesContext.Provider>
   );

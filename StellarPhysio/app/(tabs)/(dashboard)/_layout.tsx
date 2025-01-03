@@ -16,7 +16,7 @@ const DashboardScreenLayout = () => {
             headerBackVisible: true, // Displays only the back button
           }}
         />
-       <Stack.Screen name="prescriptions-charges"    options={{ headerShown: true, // Ensures the header is shown
+       <Stack.Screen name="payment_history"    options={{ headerShown: true, // Ensures the header is shown
             headerTitle: 'Prescriptions & Charges', // Removes the title
             headerBackVisible: true, // Displays only the back button
           }}

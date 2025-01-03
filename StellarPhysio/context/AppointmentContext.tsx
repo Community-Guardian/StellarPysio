@@ -2,17 +2,40 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import {
   getAppointments,
   createAppointment,
-  updateAppointment,
+  updateAppointments,
   deleteAppointment,
 } from '@/handlers/appointmentManager'; // Adjust the import path as needed
-
+import { Alert } from 'react-native';
+import { AuthProvider, useAuth } from './AuthContext';
+// Define the shape of ServicesContext
+interface Service {
+  id: number;
+  name: string;
+  serviceType: string; // Flattened from "service_type.name"
+  price: string;
+  description: string;
+  isActive: boolean;
+}
+// Define the appointment object structure
+interface Appointment {
+  id: number;
+  status: string;
+  date_time: string; // ISO format
+  duration: number; // in minutes
+  end_time: string; // ISO format
+  reason: string;
+  patient: string; // UUID
+  provider: string | null;
+  service: Service;
+  service_id: string;
+}
 // Define the shape of AppointmentContext
 interface AppointmentContextData {
-  appointments: any[];
+  appointments: Appointment[];
   loading: boolean;
   fetchAppointments: () => Promise<void>;
-  addAppointment: (appointmentData: any) => Promise<void>;
-  updateAppointment: (appointmentId: string, updatedData: any) => Promise<void>;
+  addAppointment: (appointmentData: Partial<Appointment>) => Promise<void>;
+  updateAppointment: (appointmentId: string, updatedData: Partial<Appointment>) => Promise<void>;
   removeAppointment: (appointmentId: string) => Promise<void>;
 }
 
@@ -33,24 +56,24 @@ const AppointmentContext = createContext<AppointmentContextData>({
 
 // AppointmentProvider component
 export const AppointmentProvider: React.FC<AppointmentProviderProps> = ({ children }) => {
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
+  const {isAuthenticated }= useAuth()
   // Fetch appointments from the server
   const fetchAppointments = async () => {
     try {
       setLoading(true);
       const data = await getAppointments();
-      setAppointments(data);
+      setAppointments(data); // Assuming data matches the Appointment[] structure
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      Alert.alert('Error', 'Failed to fetch appointments. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   // Add a new appointment
-  const addAppointment = async (appointmentData: any) => {
+  const addAppointment = async (appointmentData: Partial<Appointment>) => {
     try {
       setLoading(true);
       await createAppointment(appointmentData);
@@ -64,10 +87,10 @@ export const AppointmentProvider: React.FC<AppointmentProviderProps> = ({ childr
   };
 
   // Update an existing appointment
-  const updateAppointmentDetails = async (appointmentId: string, updatedData: any) => {
+  const updateAppointment = async (appointmentId: string, updatedData: Partial<Appointment>) => {
     try {
       setLoading(true);
-      await updateAppointment(appointmentId, updatedData);
+      await updateAppointments(appointmentId, updatedData);
       await fetchAppointments(); // Refresh the list after updating
     } catch (error) {
       console.error('Error updating appointment:', error);
@@ -93,11 +116,22 @@ export const AppointmentProvider: React.FC<AppointmentProviderProps> = ({ childr
 
   // Fetch appointments on mount
   useEffect(() => {
-    fetchAppointments();
+    if(isAuthenticated){
+      fetchAppointments();
+    }
   }, []);
 
   return (
-    <AppointmentContext.Provider value={{ appointments, loading, fetchAppointments, addAppointment, updateAppointment: updateAppointmentDetails, removeAppointment }}>
+    <AppointmentContext.Provider
+      value={{
+        appointments,
+        loading,
+        fetchAppointments,
+        addAppointment,
+        updateAppointment,
+        removeAppointment,
+      }}
+    >
       {children}
     </AppointmentContext.Provider>
   );

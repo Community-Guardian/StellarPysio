@@ -26,11 +26,11 @@ def generate_receipt_and_send_email(sender, instance, created, **kwargs):
                 # Generate receipt PDF
                 buffer = BytesIO()
                 pdf = canvas.Canvas(buffer, pagesize=letter)
-                pdf.setTitle("Harmosoft Book Store Receipt")
+                pdf.setTitle("StellarPysio Clinic Receipt")
 
                 # Header
                 pdf.setFont("Helvetica-Bold", 16)
-                pdf.drawString(100, 750, "Harmosoft Book Store")
+                pdf.drawString(100, 750, "StellarPysio Clinic")
 
                 # Service details
                 pdf.setFont("Helvetica", 12)

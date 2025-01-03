@@ -10,7 +10,7 @@ logger = logging.getLogger('payments')
 
 class PaymentService:
     @staticmethod
-    def create_mpesa_payment_intent(service_id, phone_number):
+    def create_mpesa_payment_intent(service_id, phone_number,user):
         cl = MpesaClient()
         
         if not service_id:
@@ -46,7 +46,8 @@ class PaymentService:
                 payment_method='mpesa',
                 payment_status='pending',
                 amount=service.price,
-                transaction_id=response_data.get('MerchantRequestID', '')
+                transaction_id=response_data.get('MerchantRequestID', ''),
+                user=user
             )
 
             logger.info(f'MPESA payment initiated for service {service_id} with status {payment.payment_status}')

@@ -3,8 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
-import Button from '@/components/Button';
-
+import { useAuth } from '@/context/AuthContext';
 interface QuickAccessTile {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
@@ -30,25 +29,28 @@ interface LastAppointment {
 }
 
 const DashboardScreen: React.FC = () => {
+  const { user } = useAuth()
   const quickAccessTiles: QuickAccessTile[] = [
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
     { title: 'Book Appointment', icon: 'calendar', screen: 'book_appointment' },
-    { title: 'Prescriptions & Charges', icon: 'document-text', screen: 'prescriptions-charges' },
+    { title: 'Payment History', icon: 'document-text', screen: 'payment_history' },
   ];
 
-  const [notifications, setNotifications] = useState<Notification[]>([{
-    id: '1',
-    title: 'Appointment Reminder',
-    message: 'You have an appointment tomorrow at 2 PM.',
-    read: false,
-  },
-  {
-    id: '2',
-    title: 'New Service',
-    message: 'Try our new sports therapy service!',
-    read: false,
-  }]);
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: '1',
+      title: 'Appointment Reminder',
+      message: 'You have an appointment tomorrow at 2 PM.',
+      read: false,
+    },
+    {
+      id: '2',
+      title: 'New Service',
+      message: 'Try our new sports therapy service!',
+      read: false,
+    },
+  ]);
 
   const [wellnessTip, setWellnessTip] = useState<WellnessTip | null>(null);
   const [lastAppointment, setLastAppointment] = useState<LastAppointment | null>(null);
@@ -74,13 +76,9 @@ const DashboardScreen: React.FC = () => {
     );
   };
 
-  const handleSeeAll = () => {
-    console.log('Navigating to all notifications');
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>Welcome, John!</Text>
+      <Text style={styles.greeting}>Welcome, {user?.details?.usernamer}!</Text>
       <ScrollView style={styles.scrollView}>
         <View>
           <Text style={styles.quickMenuTitle}>Quick Menu</Text>
@@ -98,7 +96,9 @@ const DashboardScreen: React.FC = () => {
         <View style={styles.notificationsContainer}>
           <View style={styles.notificationsHeader}>
             <Text style={styles.sectionTitle}>Notifications</Text>
-            <Button title="See All" onPress={handleSeeAll} style={styles.seeAllButton} />
+            <Link href="/notifications">
+              <Text style={styles.seeAllText}>See All</Text>
+            </Link>
           </View>
           {notifications.map((notification) => (
             <View
@@ -111,11 +111,12 @@ const DashboardScreen: React.FC = () => {
               <Text style={styles.notificationTitle}>{notification.title}</Text>
               <Text style={styles.notificationMessage}>{notification.message}</Text>
               {!notification.read && (
-                <Button
-                  title="Mark as Read"
+                <TouchableOpacity
                   onPress={() => markAsRead(notification.id)}
                   style={styles.markAsReadButton}
-                />
+                >
+                  <Text style={styles.markAsReadText}>Mark as Read</Text>
+                </TouchableOpacity>
               )}
             </View>
           ))}
@@ -132,11 +133,12 @@ const DashboardScreen: React.FC = () => {
             <Text style={styles.lastAppointmentText}>
               Your last appointment was {lastAppointment.service} on {lastAppointment.date}
             </Text>
-            <Button
-              title="Rebook Last Appointment"
+            <TouchableOpacity
               onPress={() => console.log('Rebooking last appointment')}
               style={styles.rebookButton}
-            />
+            >
+              <Text style={styles.rebookButtonText}>Rebook Last Appointment</Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
@@ -208,8 +210,10 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  seeAllButton: {
-    alignSelf: 'flex-end',
+  seeAllText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.primary,
   },
   notification: {
     marginBottom: 12,
@@ -232,6 +236,11 @@ const styles = StyleSheet.create({
   markAsReadButton: {
     marginTop: 8,
     alignSelf: 'flex-start',
+  },
+  markAsReadText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.primary,
   },
   wellnessTipContainer: {
     backgroundColor: colors.secondary,
@@ -257,6 +266,11 @@ const styles = StyleSheet.create({
   },
   rebookButton: {
     alignSelf: 'flex-start',
+  },
+  rebookButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.primary,
   },
 });
 

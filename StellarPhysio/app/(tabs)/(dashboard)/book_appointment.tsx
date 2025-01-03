@@ -1,64 +1,80 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TextInput, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TextInput, Platform, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Button from '@/components/Button';
-import { colors } from '@/utils/colors';
-import { useRoute ,RouteProp } from '@react-navigation/native'; // Import route hook
-type RouteParams = {
-  selectedService?: { name: string; description: string };
-};
+import Button from '@/components/Button'; // Ensure correct path
+import { useAppointments } from '@/context/AppointmentContext';
+import { useServices } from '@/context/ServicesContext';
+import { router } from 'expo-router';
+
+interface Service {
+  id: number;
+  name: string;
+  serviceType: string; // Flattened from "service_type.name"
+  price: string;
+  description: string;
+  isActive: boolean;
+}
+
+interface Appointment {
+  date_time: string; // ISO format
+  reason: string;
+  service_id: string;
+}
+
 const BookAppointmentScreen: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [notes, setNotes] = useState('');
+  const [service, setService] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const route = useRoute<RouteProp<{ params: RouteParams }>>(); // Type-safe usage
-  const { selectedService } = route.params || {}; // Retrieve the passed parameter
-  const [service, setService] = useState(selectedService?.name || ''); // Use selectedService as default
-  const handleConfirmAppointment = () => {
-    console.log('Appointment confirmed');
-    console.log({ service, date, time, notes });
-  };
+  const { addAppointment } = useAppointments();
+  const { services } = useServices(); // Fetch services from context
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) setDate(selectedDate);
-  };
+  const handleConfirmAppointment = async () => {
+    if (!service) {
+      Alert.alert('Validation Error', 'Please select a service.');
+      return;
+    }
 
-  const onTimeChange = (event: any, selectedTime?: Date) => {
-    setShowTimePicker(false);
-    if (selectedTime) setTime(selectedTime);
+    try {
+      const newAppointment: Appointment = {
+        date_time: new Date(`${date.toDateString()} ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`).toISOString(), // Combining date and time into ISO format
+        reason: notes,
+        service_id: service,
+      };
+      await addAppointment(newAppointment);
+      Alert.alert('Success', 'Appointment booked successfully!');
+      router.back()
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      Alert.alert('Error', 'Failed to book appointment. Please try again.');
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.formContainer}>
         {/* Service Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Service Type</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={service}
-              onValueChange={(itemValue) => setService(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Select a service" value="" />
-              <Picker.Item label="Manual Therapy" value="Manual Therapy" />
-              <Picker.Item label="Sports Therapy" value="Sports Therapy" />
-              <Picker.Item label="Rehabilitation" value="Rehabilitation" />
-            </Picker>
-          </View>
+          <Picker
+            selectedValue={service}
+            onValueChange={(itemValue) => setService(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select a service" value="" />
+            {services.map((service) => (
+              <Picker.Item key={service.id} label={service.name} value={service.id.toString()} />
+            ))}
+          </Picker>
         </View>
 
         {/* Date Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Date</Text>
-          <Text
-            style={styles.datePickerText}
-            onPress={() => setShowDatePicker(true)}
-          >
+          <Text style={styles.datePickerText} onPress={() => setShowDatePicker(true)}>
             {date.toDateString()}
           </Text>
           {showDatePicker && (
@@ -66,7 +82,10 @@ const BookAppointmentScreen: React.FC = () => {
               value={date}
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={onDateChange}
+              onChange={(event, selectedDate) => {
+                setShowDatePicker(false);
+                if (selectedDate) setDate(selectedDate);
+              }}
             />
           )}
         </View>
@@ -74,18 +93,18 @@ const BookAppointmentScreen: React.FC = () => {
         {/* Time Picker */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Time</Text>
-          <Text
-            style={styles.datePickerText}
-            onPress={() => setShowTimePicker(true)}
-          >
-            {time.toLocaleTimeString()}
+          <Text style={styles.datePickerText} onPress={() => setShowTimePicker(true)}>
+            {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </Text>
           {showTimePicker && (
             <DateTimePicker
               value={time}
               mode="time"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={onTimeChange}
+              onChange={(event, selectedTime) => {
+                setShowTimePicker(false);
+                if (selectedTime) setTime(selectedTime);
+              }}
             />
           )}
         </View>
@@ -113,14 +132,8 @@ const BookAppointmentScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    padding: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 24,
+    padding: 16,
+    backgroundColor: '#f3f4f6',
   },
   formContainer: {
     marginBottom: 24,
@@ -130,31 +143,28 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: colors.lightText,
     marginBottom: 8,
-  },
-  pickerContainer: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    overflow: 'hidden',
+    color: '#374151',
   },
   picker: {
-    height: 50,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 8,
+  },
+  datePickerText: {
+    fontSize: 16,
+    backgroundColor: '#ffffff',
+    padding: 12,
+    borderRadius: 8,
+    color: '#374151',
   },
   textArea: {
-    backgroundColor: colors.white,
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     padding: 12,
     height: 100,
     textAlignVertical: 'top',
-  },
-  datePickerText: {
-    fontSize: 16,
-    color: colors.text,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    backgroundColor: colors.white,
-    borderRadius: 8,
+    color: '#374151',
   },
 });
 

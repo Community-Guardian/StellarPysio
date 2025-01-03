@@ -1,24 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Appointment {
-  id: string;
-  date: string;
-  time: string;
-  service: string;
-  status: 'upcoming' | 'past' | 'cancelled';
+import { useAppointments } from '@/context/AppointmentContext'; // Ensure proper import path
+interface Service {
+  id: number;
+  name: string;
+  serviceType: string; 
+  price: string;
+  description: string;
+  isActive: boolean;
 }
-
+// Define the appointment object structure
+interface Appointment {
+  id: number;
+  status: string;
+  date_time: string; // ISO format
+  duration: number; // in minutes
+  end_time: string; // ISO format
+  reason: string;
+  patient: string; // UUID
+  provider: string | null;
+  service: Service;
+  service_id: string;
+}
 const AppointmentsScreen: React.FC = () => {
   const router = useRouter();
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    { id: '1', date: '2023-05-15', time: '10:00 AM', service: 'Manual Therapy', status: 'upcoming' },
-    { id: '2', date: '2023-05-18', time: '2:00 PM', service: 'Sports Therapy', status: 'upcoming' },
-    { id: '3', date: '2023-05-10', time: '11:30 AM', service: 'Rehabilitation', status: 'past' },
-    { id: '4', date: '2023-05-05', time: '3:00 PM', service: 'Massage Therapy', status: 'cancelled' },
-  ]);
+  const { appointments, loading, fetchAppointments, removeAppointment } = useAppointments();
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
   const handleCancelAppointment = (id: string) => {
     Alert.alert(
@@ -26,66 +38,62 @@ const AppointmentsScreen: React.FC = () => {
       'Are you sure you want to cancel this appointment?',
       [
         { text: 'No', style: 'cancel' },
-        { text: 'Yes', onPress: () => {
-          setAppointments(appointments.map(app => 
-            app.id === id ? { ...app, status: 'cancelled' } : app
-          ));
-        }},
+        { text: 'Yes', onPress: () => removeAppointment(id) },
       ]
     );
   };
 
   const handleRescheduleAppointment = (id: string) => {
-    Alert.alert('Reschedule', 'Feature coming soon!');
+    router.push(`/RescheduleAppointmentScreen?id=${id}`);
   };
 
   const renderAppointmentItem = ({ item }: { item: Appointment }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.date}>{item.date}</Text>
-        <Text
-          style={[
-            styles.status,
-            item.status === 'upcoming'
-              ? styles.upcoming
-              : item.status === 'past'
-              ? styles.past
-              : styles.cancelled,
-          ]}
-        >
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        </Text>
+        <Text style={styles.date}>{new Date(item.date_time).toDateString()}</Text>
+        <Text style={styles.status}>{item.status}</Text>
       </View>
-      <Text style={styles.time}>{item.time}</Text>
-      <Text style={styles.service}>{item.service}</Text>
-      {item.status === 'upcoming' && (
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.rescheduleButton}
-            onPress={() => handleRescheduleAppointment(item.id)}
-          >
-            <Ionicons name="calendar-outline" size={20} color="#3b82f6" />
-            <Text style={styles.rescheduleText}>Reschedule</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => handleCancelAppointment(item.id)}
-          >
-            <Ionicons name="close-circle-outline" size={20} color="#ef4444" />
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      <Text style={styles.time}>{new Date(item.date_time).toLocaleTimeString()}</Text>
+      <Text style={styles.service}>{item.reason}</Text>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.rescheduleButton}
+          onPress={() => handleRescheduleAppointment(item.id.toString())}
+        >
+          <Ionicons name="calendar-outline" size={20} color="#3b82f6" />
+          <Text style={styles.rescheduleText}>Reschedule</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => handleCancelAppointment(item.id.toString())}
+        >
+          <Ionicons name="close-circle-outline" size={20} color="#ef4444" />
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <FlatList
         data={appointments}
         renderItem={renderAppointmentItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <Text>No appointments available</Text>
+          </View>
+        )}
       />
       <TouchableOpacity
         style={styles.addButton}
@@ -103,12 +111,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     padding: 16,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 24,
-  },
   card: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
@@ -123,33 +125,15 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 8,
   },
   date: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#374151',
   },
   status: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  upcoming: {
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
-  },
-  past: {
-    backgroundColor: '#6b7280',
-    color: '#ffffff',
-  },
-  cancelled: {
-    backgroundColor: '#ef4444',
-    color: '#ffffff',
+    fontSize: 14,
+    color: '#6b7280',
   },
   time: {
     fontSize: 16,
@@ -177,7 +161,6 @@ const styles = StyleSheet.create({
   rescheduleText: {
     marginLeft: 8,
     color: '#3b82f6',
-    fontWeight: 'bold',
   },
   cancelButton: {
     flexDirection: 'row',
@@ -191,7 +174,6 @@ const styles = StyleSheet.create({
   cancelText: {
     marginLeft: 8,
     color: '#ef4444',
-    fontWeight: 'bold',
   },
   addButton: {
     position: 'absolute',

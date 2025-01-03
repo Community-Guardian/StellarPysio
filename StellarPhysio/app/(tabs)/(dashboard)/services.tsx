@@ -1,35 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
-import { useNavigation } from '@react-navigation/native'; // Import navigation hook
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-}
-
+import { useServices } from '@/context/ServicesContext';
+import { useRouter } from 'expo-router';
 const ServicesScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const navigation = useNavigation();
+  const router = useRouter();
 
-  const services: Service[] = [
-    { id: '1', name: 'Manual Therapy', description: 'Hands-on treatment to manipulate joints and soft tissue.' },
-    { id: '2', name: 'Sports Therapy', description: 'Specialized treatment for sports-related injuries and performance enhancement.' },
-    { id: '3', name: 'Rehabilitation', description: 'Comprehensive programs to restore function after injury or surgery.' },
-    { id: '4', name: 'Massage Therapy', description: 'Therapeutic massage to relieve muscle tension and promote relaxation.' },
-  ];
+  const { services, loading } = useServices(); // Fetch services from context
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleBookNow = (service: Service) => {
-    navigation.navigate('book_appointment', { selectedService: service });
+  const handleBookNow = (service: any) => {
+    router.push('/(tabs)/(dashboard)/book_appointment');
   };
 
-  const renderServiceItem = ({ item }: { item: Service }) => (
+  const renderServiceItem = ({ item }: { item: any }) => (
     <View style={styles.serviceItem}>
       <Text style={styles.serviceName}>{item.name}</Text>
       <Text style={styles.serviceDescription}>{item.description}</Text>
@@ -58,12 +47,19 @@ const ServicesScreen: React.FC = () => {
           onChangeText={setSearchQuery}
         />
       </View>
-      <FlatList
-        data={filteredServices}
-        renderItem={renderServiceItem}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        <FlatList
+          data={filteredServices}
+          renderItem={renderServiceItem}
+          keyExtractor={item => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyMessage}>No services found.</Text>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -73,12 +69,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 24,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -130,7 +120,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+  emptyMessage: {
+    textAlign: 'center',
+    color: colors.lightText,
+    fontSize: 16,
+    marginTop: 20,
+  },
 });
 
 export default ServicesScreen;
-
