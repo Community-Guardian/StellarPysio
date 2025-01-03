@@ -13,9 +13,10 @@ const ServicesScreen: React.FC = () => {
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+console.log(filteredServices);
 
   const handleBookNow = (service: any) => {
-    router.push('/(tabs)/(dashboard)/book_appointment');
+    router.push(`/(tabs)/(dashboard)/book_appointment?selectedService=${service.id}`);
   };
 
   const renderServiceItem = ({ item }: { item: any }) => (
@@ -26,15 +27,29 @@ const ServicesScreen: React.FC = () => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Learn More</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.bookButton]}
-          onPress={() => handleBookNow(item)}
-        >
-          <Text style={styles.buttonText}>Book Now</Text>
-        </TouchableOpacity>
+        {item.serviceType == 'Prescriptions' ? (
+          <TouchableOpacity
+            style={[styles.button, styles.payButton]}
+            onPress={() => handlePayNow(item)}
+          >
+            <Text style={styles.buttonText}>Pay Now</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.button, styles.bookButton]}
+            onPress={() => handleBookNow(item)}
+          >
+            <Text style={styles.buttonText}>Book Now</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
+  
+  // Handle Pay Now Button
+  const handlePayNow = (service: any) => {
+    router.push(`/(tabs)/(finances)/pay_now?serviceId=${service.id}`);
+  };
 
   return (
     <View style={styles.container}>
@@ -77,6 +92,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 16,
+  },
+  payButton: {
+    backgroundColor: colors.secondary, // Add an accent color for the Pay Now button
   },
   searchInput: {
     flex: 1,

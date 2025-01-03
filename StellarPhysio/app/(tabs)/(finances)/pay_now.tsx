@@ -27,7 +27,7 @@ const PayNowScreen: React.FC = () => {
 
   useEffect(() => {
     fetchServices(); // Fetch services on mount
-  }, [fetchServices]);
+  }, []);
 
   useEffect(() => {
     if (serviceId) {
@@ -114,7 +114,7 @@ const PayNowScreen: React.FC = () => {
             />
             <Button
               title="Back to Payments"
-              onPress={() => router.back()}
+              onPress={() => router.push('/(tabs)/(finances)')}
               variant="outline"
               style={styles.button}
             />

@@ -6,8 +6,8 @@ const AppointmentsScreenLayout = () => {
   return (
     <Stack>
        <Stack.Screen name="index" options={{ headerShown: true,headerTitle: 'Payments',}} />
-       <Stack.Screen name="pay_now" options={{ headerShown: true,headerTitle: 'Pay Now',}} />
-       </Stack>
+       <Stack.Screen name="pay_now" options={{ headerShown: true,headerTitle: 'Pay Now', headerBackVisible: true,}} />
+    </Stack>
   )
 }
 

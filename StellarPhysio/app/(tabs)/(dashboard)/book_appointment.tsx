@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from '@/components/Button'; // Ensure correct path
 import { useAppointments } from '@/context/AppointmentContext';
 import { useServices } from '@/context/ServicesContext';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 interface Service {
   id: number;
@@ -23,10 +23,11 @@ interface Appointment {
 }
 
 const BookAppointmentScreen: React.FC = () => {
+  const { selectedService } = useLocalSearchParams();
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
   const [notes, setNotes] = useState('');
-  const [service, setService] = useState('');
+  const [service, setService] = useState(selectedService || ''); // Use the selectedService as default value
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const { addAppointment } = useAppointments();
@@ -39,14 +40,28 @@ const BookAppointmentScreen: React.FC = () => {
     }
 
     try {
+      // Combine date and time properly
+      const combinedDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes(),
+      );
+
+      if (isNaN(combinedDate.getTime())) {
+        throw new Error('Invalid date or time value');
+      }
+
       const newAppointment: Appointment = {
-        date_time: new Date(`${date.toDateString()} ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`).toISOString(), // Combining date and time into ISO format
+        date_time: combinedDate.toISOString(),
         reason: notes,
         service_id: service,
       };
+
       await addAppointment(newAppointment);
       Alert.alert('Success', 'Appointment booked successfully!');
-      router.back()
+      router.back();
     } catch (error) {
       console.error('Error booking appointment:', error);
       Alert.alert('Error', 'Failed to book appointment. Please try again.');
