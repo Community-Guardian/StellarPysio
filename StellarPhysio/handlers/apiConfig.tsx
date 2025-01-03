@@ -1,5 +1,6 @@
 // Base URL configurations
-const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environment
+const BASE_URL = 'https://stellarphysio.pythonanywhere.com'; // Update this as per your environment
+// const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environment
 // const BASE_URL = 'http://127.0.0.1:8000'; // Update this as per your environment
 
 // User endpoints
