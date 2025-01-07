@@ -11,7 +11,7 @@ const LoginScreen: React.FC = () => {
   const router = useRouter()
   const handleLogin = () => {
     console.log('Login button pressed');
-    router.push('(admin)')
+    router.push('/(tabs)/(dashboard)')
   };
 
   return (

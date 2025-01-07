@@ -6,7 +6,7 @@ const InventoryLayout = () => {
   return (
     <Stack>
        <Stack.Screen name="index" options={{ headerShown: true,headerTitle: 'Dashboard' }}/>
-       <Stack.Screen name="SuppliersScreen" options={{ headerShown: true,headerTitle: 'Profile' }}/>
+       <Stack.Screen name="SupplierScreen" options={{ headerShown: true,headerTitle: 'Profile' }}/>
     </Stack>
   )
 }

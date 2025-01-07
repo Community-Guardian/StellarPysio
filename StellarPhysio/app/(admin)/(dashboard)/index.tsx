@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import Button from '@/components/Button';
 
 const AdminDashboardScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useRouter();
 
   const navigateToScreen = (screenName: string) => {
     navigation.navigate(screenName);
