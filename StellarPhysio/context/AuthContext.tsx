@@ -87,6 +87,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('Error loading emergency contacts:', error);
       }
     }
+    setLoading(false);
   };
 
   // Login function

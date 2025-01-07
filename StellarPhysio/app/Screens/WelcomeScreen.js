@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../styles/colors';
-import Button from '../components/Button';
+import { colors } from '../../styles/colors';
+import Button from '../../components/Button';
 
 const WelcomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Image
-          source={require('../assets/stellarphysio-logo.png')}
+          source={require('@/assets/images/logo.webp')}
           style={styles.logo}
         />
         <Text style={styles.tagline}>Your Health, Our Priority</Text>

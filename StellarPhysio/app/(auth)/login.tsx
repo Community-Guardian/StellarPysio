@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import Button from '@/components/Button';
 import { Ionicons } from '@expo/vector-icons';
-import Button from '../../components/Button';
-import { colors } from '../../utils/colors';
-import { useAuth } from '../../context/AuthContext'; // Import useAuth
 import { useRouter } from 'expo-router';
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const { login, loading } = useAuth(); // Destructure login from AuthContext
   const router = useRouter()
-  const handleLogin = async () => {
-    try {
-      setError(''); // Clear previous errors
-      await login(email, password);
-      router.push('/(tabs)/(dashboard)')
-    } catch (error) {
-      setError('Invalid email or password');
-      console.error('Login error:', error);
-    }
+  const handleLogin = () => {
+    console.log('Login button pressed');
+    router.push('(admin)')
   };
 
   return (
@@ -44,30 +35,28 @@ const LoginScreen: React.FC = () => {
             secureTextEntry={!showPassword}
           />
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={styles.passwordToggle}
             onPress={() => setShowPassword(!showPassword)}
           >
             <Ionicons
               name={showPassword ? 'eye-off' : 'eye'}
               size={24}
-              color={colors.lightText}
+              color="#777777"
             />
           </TouchableOpacity>
         </View>
-        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
-      <Button title="Login" onPress={handleLogin} loading={loading} />
-      <TouchableOpacity
-        style={styles.forgotPassword}
-        onPress={() => console.log('Navigate to forgot password')}
-      >
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-      </TouchableOpacity>
-      <View style={styles.registerPrompt}>
-        <Text style={styles.registerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.registerLink}>Register</Text>
+      <Button title="Login" onPress={handleLogin} />
+      <Link href="/forgot-password" asChild>
+        <TouchableOpacity style={styles.forgotPassword}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
+      </Link>
+      <View style={styles.registerContainer}>
+        <Text style={styles.registerText}>Don't have an account? </Text>
+        <Link href="/register" asChild>
+          <Text style={styles.registerLink}>Register</Text>
+        </Link>
       </View>
     </View>
   );
@@ -76,66 +65,58 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    padding: 24,
+    backgroundColor: '#f5f5f5', // Replace 'bg-background'
+    padding: 24, // 'p-6'
     justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 28, // 'text-3xl'
     fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 24,
+    color: '#333', // Replace 'text-text'
+    marginBottom: 32, // 'mb-8'
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 24, // 'mb-6'
   },
   input: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    fontSize: 16,
+    backgroundColor: '#fff', // 'bg-white'
+    padding: 16, // 'p-4'
+    borderRadius: 8, // 'rounded-lg'
+    fontSize: 16, // 'text-base'
+    marginBottom: 16, // 'space-y-4'
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 8,
+    flexDirection: 'row', // 'flex-row'
+    alignItems: 'center', // 'items-center'
+    backgroundColor: '#fff', // 'bg-white'
+    borderRadius: 8, // 'rounded-lg'
   },
   passwordInput: {
-    flex: 1,
-    padding: 16,
-    fontSize: 16,
+    flex: 1, // 'flex-1'
+    padding: 16, // 'p-4'
+    fontSize: 16, // 'text-base'
   },
-  eyeIcon: {
-    padding: 16,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: 14,
-    marginTop: 8,
+  passwordToggle: {
+    padding: 16, // 'p-4'
   },
   forgotPassword: {
+    marginTop: 16, // 'mt-4'
     alignSelf: 'center',
-    marginTop: 16,
   },
   forgotPasswordText: {
-    color: colors.primary,
-    fontSize: 14,
+    color: '#007BFF', // Replace 'text-primary'
   },
-  registerPrompt: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
+  registerContainer: {
+    flexDirection: 'row', // 'flex-row'
+    justifyContent: 'center', // 'justify-center'
+    marginTop: 24, // 'mt-6'
   },
   registerText: {
-    color: colors.text,
-    fontSize: 14,
+    color: '#333', // Replace 'text-text'
   },
   registerLink: {
-    color: colors.primary,
-    fontWeight: 'bold',
-    fontSize: 14,
+    color: '#007BFF', // Replace 'text-primary'
+    fontWeight: 'bold', // 'font-bold'
   },
 });
 

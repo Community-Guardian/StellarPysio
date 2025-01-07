@@ -1,149 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/utils/colors';
-import { useServices } from '@/context/ServicesContext';
-import { useRouter } from 'expo-router';
+
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+}
+
 const ServicesScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const router = useRouter();
 
-  const { services, loading } = useServices(); // Fetch services from context
+  const services: Service[] = [
+    { id: '1', name: 'Manual Therapy', description: 'Hands-on treatment to manipulate joints and soft tissue.' },
+    { id: '2', name: 'Sports Therapy', description: 'Specialized treatment for sports-related injuries and performance enhancement.' },
+    { id: '3', name: 'Rehabilitation', description: 'Comprehensive programs to restore function after injury or surgery.' },
+    { id: '4', name: 'Massage Therapy', description: 'Therapeutic massage to relieve muscle tension and promote relaxation.' },
+  ];
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-console.log(filteredServices);
 
-  const handleBookNow = (service: any) => {
-    router.push(`/(tabs)/(dashboard)/book_appointment?selectedService=${service.id}`);
-  };
-
-  const renderServiceItem = ({ item }: { item: any }) => (
-    <View style={styles.serviceItem}>
-      <Text style={styles.serviceName}>{item.name}</Text>
-      <Text style={styles.serviceDescription}>{item.description}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Learn More</Text>
+  const renderServiceItem = ({ item }: { item: Service }) => (
+    <View className="bg-white p-4 rounded-lg mb-4">
+      <Text className="text-lg font-bold text-text mb-2">{item.name}</Text>
+      <Text className="text-sm text-lightText mb-4">{item.description}</Text>
+      <View className="flex-row justify-between">
+        <TouchableOpacity className="bg-primary py-2 px-4 rounded-lg">
+          <Text className="text-white font-bold">Learn More</Text>
         </TouchableOpacity>
-        {item.serviceType == 'Prescriptions' ? (
-          <TouchableOpacity
-            style={[styles.button, styles.payButton]}
-            onPress={() => handlePayNow(item)}
-          >
-            <Text style={styles.buttonText}>Pay Now</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.button, styles.bookButton]}
-            onPress={() => handleBookNow(item)}
-          >
-            <Text style={styles.buttonText}>Book Now</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity className="bg-secondary py-2 px-4 rounded-lg">
+          <Text className="text-white font-bold">Book Now</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
-  
-  // Handle Pay Now Button
-  const handlePayNow = (service: any) => {
-    router.push(`/(tabs)/(finances)/pay_now?serviceId=${service.id}`);
-  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={24} color={colors.lightText} />
+    <View className="flex-1 bg-background p-6">
+      <Text className="text-2xl font-bold text-text mb-6">Our Services</Text>
+      <View className="flex-row items-center bg-white rounded-lg p-2 mb-4">
+        <Ionicons name="search" size={24} color="#777777" />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 ml-2 text-base"
           placeholder="Search services"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
-      {loading ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : (
-        <FlatList
-          data={filteredServices}
-          renderItem={renderServiceItem}
-          keyExtractor={item => item.id.toString()}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text style={styles.emptyMessage}>No services found.</Text>
-          }
-        />
-      )}
+      <FlatList
+        data={filteredServices}
+        renderItem={renderServiceItem}
+        keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 24,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-  },
-  payButton: {
-    backgroundColor: colors.secondary, // Add an accent color for the Pay Now button
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 16,
-    color: colors.text,
-    paddingVertical: 12,
-  },
-  serviceItem: {
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-  },
-  serviceName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  serviceDescription: {
-    fontSize: 14,
-    color: colors.lightText,
-    marginBottom: 16,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  bookButton: {
-    backgroundColor: colors.secondary,
-  },
-  buttonText: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  emptyMessage: {
-    textAlign: 'center',
-    color: colors.lightText,
-    fontSize: 16,
-    marginTop: 20,
-  },
-});
-
 export default ServicesScreen;
+

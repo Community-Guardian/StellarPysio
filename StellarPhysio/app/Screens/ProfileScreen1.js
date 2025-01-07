@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../styles/colors';
-import Button from '../components/Button';
+import { colors } from '../../styles/colors';
+import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
 
 const ProfileScreen = () => {
@@ -30,7 +30,7 @@ const ProfileScreen = () => {
       <View style={styles.content}>
         <View style={styles.profileImageContainer}>
           <Image
-            source={require('../assets/profile-placeholder.png')}
+            source={require('@/assets/images/profile-placeholder.png')}
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.editImageButton}>

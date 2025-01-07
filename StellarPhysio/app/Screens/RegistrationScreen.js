@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../styles/colors';
-import Button from '../components/Button';
+import { colors } from '../../styles/colors';
+import Button from '../../components/Button';
 import { Ionicons } from '@expo/vector-icons';
 
 const RegistrationScreen = ({ navigation }) => {

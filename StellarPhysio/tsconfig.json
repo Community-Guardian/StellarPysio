@@ -16,5 +16,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "Screens/DashboardScreen.js", "Screens/LoginScreen.js"  ]
+, "app/Screens/DashboardScreen1.js", "app/Screens/LoginScreen1.js"  ]
 }
