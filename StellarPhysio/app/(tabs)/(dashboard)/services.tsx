@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Service {
@@ -23,27 +23,27 @@ const ServicesScreen: React.FC = () => {
   );
 
   const renderServiceItem = ({ item }: { item: Service }) => (
-    <View className="bg-white p-4 rounded-lg mb-4">
-      <Text className="text-lg font-bold text-text mb-2">{item.name}</Text>
-      <Text className="text-sm text-lightText mb-4">{item.description}</Text>
-      <View className="flex-row justify-between">
-        <TouchableOpacity className="bg-primary py-2 px-4 rounded-lg">
-          <Text className="text-white font-bold">Learn More</Text>
+    <View style={styles.serviceCard}>
+      <Text style={styles.serviceName}>{item.name}</Text>
+      <Text style={styles.serviceDescription}>{item.description}</Text>
+      <View style={styles.serviceActions}>
+        <TouchableOpacity style={styles.learnMoreButton}>
+          <Text style={styles.buttonText}>Learn More</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="bg-secondary py-2 px-4 rounded-lg">
-          <Text className="text-white font-bold">Book Now</Text>
+        <TouchableOpacity style={styles.bookNowButton}>
+          <Text style={styles.buttonText}>Book Now</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <View className="flex-1 bg-background p-6">
-      <Text className="text-2xl font-bold text-text mb-6">Our Services</Text>
-      <View className="flex-row items-center bg-white rounded-lg p-2 mb-4">
+    <View style={styles.container}>
+      <Text style={styles.title}>Our Services</Text>
+      <View style={styles.searchContainer}>
         <Ionicons name="search" size={24} color="#777777" />
         <TextInput
-          className="flex-1 ml-2 text-base"
+          style={styles.searchInput}
           placeholder="Search services"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -59,5 +59,71 @@ const ServicesScreen: React.FC = () => {
   );
 };
 
-export default ServicesScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#333',
+  },
+  serviceCard: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  serviceName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  serviceDescription: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 16,
+  },
+  serviceActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  learnMoreButton: {
+    backgroundColor: '#4A90E2',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  bookNowButton: {
+    backgroundColor: '#50C878',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+});
 
+export default ServicesScreen;

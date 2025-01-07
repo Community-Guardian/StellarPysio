@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-
+import { useRouter } from 'expo-router';
 interface QuickAccessTile {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
@@ -26,12 +26,12 @@ interface Notification {
 const DashboardScreen: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const unreadNotifications = 2; // Example unread notifications count
-
+  const router = useRouter();
   const quickAccessTiles: QuickAccessTile[] = [
-    { title: 'Book Appointment', icon: 'calendar', screen: 'book-appointment' },
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
-    { title: 'Feedback', icon: 'star', screen: 'feedback' },
+    { title: 'My Archievments', icon: 'star', screen: 'CertificationScreen' },
+    { title: 'Articles', icon: 'book', screen: 'articles' },
   ];
 
   const notifications: Notification[] = [
@@ -87,15 +87,23 @@ const DashboardScreen: React.FC = () => {
       <Modal transparent visible={menuVisible} animationType="fade">
         <Pressable style={styles.modalOverlay} onPress={toggleMenu} />
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={toggleMenu}>
-            <Ionicons name="notifications" size={20} color="#333" />
-            <Text style={styles.menuText}>Notifications</Text>
-            {unreadNotifications > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{unreadNotifications}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+          <TouchableOpacity
+                style={styles.menuItem}
+                onPress={async () => {
+                  setMenuVisible(false); // Close the menu
+                  await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
+                  router.push('/(tabs)/(dashboard)/NotificationsScreen'); // Redirect to the desired screen
+                }}
+              >
+                <Ionicons name="notifications" size={20} color="#333" />
+                <Text style={styles.menuText}>Notifications</Text>
+                {unreadNotifications > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{unreadNotifications}</Text>
+                  </View>
+                )}
+            </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={toggleMenu}>
             <Ionicons name="information-circle" size={20} color="#333" />
             <Text style={styles.menuText}>About Us</Text>

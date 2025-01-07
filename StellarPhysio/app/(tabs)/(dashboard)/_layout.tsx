@@ -26,6 +26,11 @@ const DashboardScreenLayout = () => {
             headerBackVisible: true, // Displays only the back button
           }}
         />
+        <Stack.Screen name="CertificationScreen"    options={{ headerShown: true, // Ensures the header is shown
+          headerTitle: 'My Archievements', // Removes the title
+          headerBackVisible: true, // Displays only the back button
+        }}
+      />
     </Stack>
   )
 }
