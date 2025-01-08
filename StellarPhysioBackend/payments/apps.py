@@ -6,3 +6,4 @@ class PaymentsConfig(AppConfig):
     name = 'payments'
 def ready(self):
         import notifications.signals
+        import logs.signals

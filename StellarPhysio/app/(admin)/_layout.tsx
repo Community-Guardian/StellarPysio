@@ -1,3 +1,4 @@
+// StellarPhysio/app/(admin)/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
 
@@ -11,25 +12,18 @@ export default function AdminTabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#FF0000', // Set active tab icon to red
-        tabBarInactiveTintColor: '#000000', // Set inactive tab icon to black
+        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF', // White background for the tab bar
-          height: 60, // Adjust height for more space
-          borderTopWidth: 1,
-          borderTopColor: '#E5E5E5',
+          backgroundColor: Colors[colorScheme].background,
         },
-        tabBarLabelStyle: {
-          fontSize: 12, // Smaller font for tab labels
-        },
-        headerShown: false, // Hide the header
+        headerShown: false,
       }}
     >
       <Tabs.Screen
-        name="(dasboard)"
+        name="(dashboard)"
         options={{
-          title: 'Home',
-          headerShown:false,
+          title: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
@@ -40,7 +34,7 @@ export default function AdminTabLayout() {
         options={{
           title: 'Inventory',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'cash' : 'cash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'cube' : 'cube-outline'} color={color} />
           ),
         }}
       />
@@ -49,7 +43,7 @@ export default function AdminTabLayout() {
         options={{
           title: 'Notifications',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+            <TabBarIcon name={focused ? 'notifications' : 'notifications-outline'} color={color} />
           ),
         }}
       />
@@ -58,7 +52,7 @@ export default function AdminTabLayout() {
         options={{
           title: 'Reports',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'menu' : 'menu-outline'} color={color} />
+            <TabBarIcon name={focused ? 'bar-chart' : 'bar-chart-outline'} color={color} />
           ),
         }}
       />

@@ -6,3 +6,4 @@ class ArticlesConfig(AppConfig):
     name = 'articles'
 def ready(self):
         import notifications.signals
+        import logs.signals

@@ -7,3 +7,4 @@ class AppointmentsConfig(AppConfig):
     def ready(self):
         import appointments.signals  
         import notifications.signals
+        import logs.signals

@@ -26,35 +26,14 @@ const ServicesScreen: React.FC = () => {
   }, []);
 
   const handlePayNow = (serviceId: string) => {
-    Alert.prompt(
-      "Enter Phone Number",
-      "Please enter your M-Pesa phone number",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        },
-        {
-          text: "OK",
-          onPress: (number: string | undefined) => {
-            if (number) {
-              setPhoneNumber(number);
-              createPaymentIntent(serviceId, number)
-                .then(() => Alert.alert("Payment Initiated", "Please check your phone for the M-Pesa prompt."))
-                .catch((error) => Alert.alert("Error", "Failed to initiate payment. Please try again."));
-            }
-          }
-        }
-      ],
-      "plain-text"
-    );
+    console.log('Pay now', serviceId);
+    router.push(`/(tabs)/(finances)/pay_now?serviceId=${serviceId}`);
+
   };
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log(filteredServices);
   const renderServiceItem = ({ item }: { item: Service }) => (
     <View style={styles.serviceCard}>
       <Text style={styles.serviceName}>{item.name}</Text>

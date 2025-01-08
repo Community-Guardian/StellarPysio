@@ -10,6 +10,7 @@ import {
   Pressable,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,6 +23,12 @@ interface QuickAccessTile {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
   screen: string;
+}
+interface NotificationType {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
 }
 
 interface Notification {
@@ -63,6 +70,20 @@ const DashboardScreen: React.FC = () => {
   const markAsRead = (id: number) => {
     markNotificationAsRead(id);
   };
+  const showMenu = (id: number) => {
+    Alert.alert(
+      'Notification Options',
+      'What would you like to do?',
+      [
+        {
+          text: 'Mark as Read',
+          onPress: () => markAsRead(id),
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const renderNotificationItem = ({ item }: { item: Notification }) => (
     <TouchableOpacity style={styles.card}>
@@ -77,7 +98,7 @@ const DashboardScreen: React.FC = () => {
       </View>
       <TouchableOpacity
         style={styles.menuButton}
-        onPress={() => markAsRead(item.id)} // Mark as read when the dots are pressed
+        onPress={() => showMenu(item.id)} //dots are pressed
       >
         <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
       </TouchableOpacity>

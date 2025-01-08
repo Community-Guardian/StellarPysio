@@ -6,3 +6,4 @@ class AchievementsConfig(AppConfig):
     name = 'achievements'
 def ready(self):
         import notifications.signals
+        import logs.signals

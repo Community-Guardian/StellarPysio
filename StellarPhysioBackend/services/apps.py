@@ -6,3 +6,4 @@ class ServicesConfig(AppConfig):
     name = 'services'
 def ready(self):
         import notifications.signals
+        import logs.signals

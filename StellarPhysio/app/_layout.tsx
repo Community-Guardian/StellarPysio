@@ -17,6 +17,7 @@ import { ArticlesProvider } from '@/context/ArticlesContext';
 import { FeedbackProvider } from '@/context/FeedbackContext';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { AchievementsProvider } from '@/context/AchievementsContext';
+import { LogsProvider } from '@/context/LogsContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -47,13 +48,15 @@ export default function RootLayout() {
                   <FeedbackProvider>
                     <NotificationProvider>
                       <AchievementsProvider>
-                        <Stack>
-                          <Stack.Screen name="index" options={{ headerShown: false }} />
-                          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                          <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-                          <Stack.Screen name="+not-found" />
-                        </Stack>
+                        <LogsProvider>
+                         <Stack>
+                            <Stack.Screen name="index" options={{ headerShown: false }} />
+                            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                            <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+                            <Stack.Screen name="+not-found" />
+                          </Stack>
+                        </LogsProvider>
                       </AchievementsProvider>
                     </NotificationProvider>
                   </FeedbackProvider>

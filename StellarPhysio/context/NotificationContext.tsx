@@ -53,7 +53,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const data = await getNotifications();
+      const data = await getUnreadNotifications();
       setNotifications(data);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch notifications.');

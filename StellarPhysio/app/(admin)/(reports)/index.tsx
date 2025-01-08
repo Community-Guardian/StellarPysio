@@ -1,15 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Button from '@/components/Button';
+import { useLogs } from '@/context/LogsContext';
+import { generatePDFReport } from '@/utils/pdfGenerator';
 
 const ReportsScreen = () => {
+  const { logs, fetchLogs, loading } = useLogs();
   const [selectedReport, setSelectedReport] = useState('userActivity');
   const [selectedTimeFrame, setSelectedTimeFrame] = useState('lastWeek');
+  const [filteredLogs, setFilteredLogs] = useState([]);
 
-  const generateReport = () => {
-    // Implement logic to generate the selected report
-    console.log(`Generating ${selectedReport} report for ${selectedTimeFrame}`);
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  useEffect(() => {
+    filterLogs();
+  }, [logs, selectedTimeFrame]);
+
+  const filterLogs = () => {
+    const now = new Date();
+    let startDate;
+
+    switch (selectedTimeFrame) {
+      case 'lastWeek':
+        startDate = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case 'lastMonth':
+        startDate = new Date(now.setMonth(now.getMonth() - 1));
+        break;
+      case 'lastQuarter':
+        startDate = new Date(now.setMonth(now.getMonth() - 3));
+        break;
+      case 'lastYear':
+        startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+        break;
+      default:
+        startDate = new Date(now.setDate(now.getDate() - 7));
+    }
+
+    const filtered = logs.filter(log => new Date(log.timestamp) >= startDate);
+    setFilteredLogs(filtered);
+  };
+
+  const generateReport = async () => {
+    try {
+      const reportData = filteredLogs.filter(log => log.level === selectedReport.toUpperCase());
+      await generatePDFReport(reportData, selectedReport, selectedTimeFrame);
+      Alert.alert('Report Generated', 'The report has been generated successfully.');
+    } catch (error) {
+      console.error('Error generating report:', error);
+      Alert.alert('Error', 'Failed to generate the report. Please try again.');
+    }
   };
 
   return (
@@ -22,10 +65,9 @@ const ReportsScreen = () => {
           onValueChange={(itemValue) => setSelectedReport(itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="User Activity" value="userActivity" />
-          <Picker.Item label="Appointment Statistics" value="appointmentStats" />
-          <Picker.Item label="Financial Summary" value="financialSummary" />
-          <Picker.Item label="Patient Progress" value="patientProgress" />
+          <Picker.Item label="Information" value="Info" />
+          <Picker.Item label="Warnings" value="warning" />
+          <Picker.Item label="Errors" value="error" />
         </Picker>
       </View>
       <View style={styles.pickerContainer}>
@@ -104,4 +146,3 @@ const styles = StyleSheet.create({
 });
 
 export default ReportsScreen;
-

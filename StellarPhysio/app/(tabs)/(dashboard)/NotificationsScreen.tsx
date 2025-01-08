@@ -21,8 +21,9 @@ const NotificationsScreen = () => {
 
   const markAllAsRead = () => {
     notifications.forEach(notification => {
-      if (!notification.read) {
+      if (!notification.is_read) {
         markNotificationAsRead(notification.id);
+        fetchNotifications(); // Refetch notifications to update the UI
       }
     });
   };

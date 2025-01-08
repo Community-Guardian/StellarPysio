@@ -33,5 +33,7 @@ export const ARTICLES_URL = `${BASE_URL}/articles/`;
 // Base URL for achievements
 export const ACHIEVEMENTS_URL = `${BASE_URL}/achievements/`;
 
+// Base URL for workouts
+export const LOGS_URL = `${BASE_URL}/logs/`;
 // Exporting BASE_URL for external use
 export { BASE_URL };

@@ -1,49 +1,34 @@
+// StellarPhysio/app/(admin)/(dashboard)/index.tsx
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import Button from '@/components/Button';
+import { Ionicons } from '@expo/vector-icons';
 
-const AdminDashboardScreen = () => {
-  const navigation = useRouter();
+const AdminDashboardScreen: React.FC = () => {
+  const router = useRouter();
 
-  const navigateToScreen = (screenName: string) => {
-    navigation.navigate(screenName);
-  };
+  const menuItems = [
+    { title: 'Reports', icon: 'bar-chart', route: '/(admin)/(reports)' },
+    { title: 'Notifications', icon: 'notifications', route: '/(admin)/(notifications)' },
+    { title: 'Logs', icon: 'document-text', route: '/(admin)/(notifications)/LogsScreen' },
+    { title: 'Manage Users', icon: 'people', route: '/(admin)/(users)' },
+    { title: 'System Settings', icon: 'settings', route: '/(admin)/(settings)' },
+  ];
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Administrator Dashboard</Text>
-      <View style={styles.moduleContainer}>
-        <Button
-          title="Manage Users"
-          onPress={() => navigateToScreen('ManageUsers')}
-          style={styles.moduleButton}
-        />
-        <Button
-          title="Approve Accounts"
-          onPress={() => navigateToScreen('ApproveAccounts')}
-          style={styles.moduleButton}
-        />
-        <Button
-          title="System Settings"
-          onPress={() => navigateToScreen('SystemSettings')}
-          style={styles.moduleButton}
-        />
-        <Button
-          title="Reports"
-          onPress={() => navigateToScreen('Reports')}
-          style={styles.moduleButton}
-        />
-        <Button
-          title="Notifications"
-          onPress={() => navigateToScreen('Notifications')}
-          style={styles.moduleButton}
-        />
-        <Button
-          title="Logs"
-          onPress={() => navigateToScreen('Logs')}
-          style={styles.moduleButton}
-        />
+      <Text style={styles.title}>Admin Dashboard</Text>
+      <View style={styles.menuContainer}>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.menuItem}
+            onPress={() => router.push(item.route)}
+          >
+            <Ionicons name={item.icon} size={24} color="#4A90E2" style={styles.menuIcon} />
+            <Text style={styles.menuText}>{item.title}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
     </ScrollView>
   );
@@ -61,16 +46,32 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#333',
   },
-  moduleContainer: {
+  menuContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  moduleButton: {
+  menuItem: {
     width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
     marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  menuIcon: {
+    marginRight: 10,
+  },
+  menuText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 
 export default AdminDashboardScreen;
-

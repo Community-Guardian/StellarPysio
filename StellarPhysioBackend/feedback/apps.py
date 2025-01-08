@@ -6,3 +6,4 @@ class FeedbackConfig(AppConfig):
     name = 'feedback'
 def ready(self):
         import notifications.signals
+        import logs.signals

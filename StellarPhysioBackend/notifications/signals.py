@@ -12,7 +12,7 @@ from achievements.models import Achievement
 def create_appointment_notification(sender, instance, created, **kwargs):
     if created:
         Notification.objects.create(
-            user=instance.user,
+            user=instance.patient,
             notification_type=NotificationType.objects.get(name=NotificationType.Type.ALERT),
             title="New Appointment",
             message=f"Your appointment with {instance.provider} is scheduled for {instance.date_time}.",
