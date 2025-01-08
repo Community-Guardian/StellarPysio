@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useLogs } from '@/context/LogsContext';
 
 interface LogEntry {
   id: string;
   timestamp: string;
-  level: 'INFO' | 'WARNING' | 'ERROR';
-  message: string;
+  log_type: 'INFO' | 'WARNING' | 'ERROR';
+  details: string;
 }
 
 const LogsScreen = () => {
-  const [logs, setLogs] = useState<LogEntry[]>([
-    { id: '1', timestamp: '2023-05-15 10:30:15', level: 'INFO', message: 'User login successful' },
-    { id: '2', timestamp: '2023-05-15 11:45:22', level: 'WARNING', message: 'Failed login attempt' },
-    { id: '3', timestamp: '2023-05-15 13:15:07', level: 'ERROR', message: 'Database connection failed' },
-  ]);
-
+  const { logs, fetchLogs, loading } = useLogs();
   const [filterLevel, setFilterLevel] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredLogs = logs.filter(log => 
-    (filterLevel === 'ALL' || log.level === filterLevel) &&
-    (log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const filteredLogs = logs.filter(log =>
+    (filterLevel === 'ALL' || log.log_type === filterLevel) &&
+    (log.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
      log.timestamp.includes(searchQuery))
   );
 
   const renderLogItem = ({ item }: { item: LogEntry }) => (
-    <View style={[styles.logItem, styles[`log${item.level}`]]}>
+    <View style={[styles.logItem, styles[`log${item.log_type}`]]}>
       <Text style={styles.logTimestamp}>{item.timestamp}</Text>
-      <Text style={styles.logLevel}>{item.level}</Text>
-      <Text style={styles.logMessage}>{item.message}</Text>
+      <Text style={styles.logLevel}>{item.log_type}</Text>
+      <Text style={styles.logMessage}>{item.details}</Text>
     </View>
   );
 
@@ -54,11 +54,15 @@ const LogsScreen = () => {
           onChangeText={setSearchQuery}
         />
       </View>
-      <FlatList
-        data={filteredLogs}
-        renderItem={renderLogItem}
-        keyExtractor={item => item.id}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={filteredLogs}
+          renderItem={renderLogItem}
+          keyExtractor={item => item.id}
+        />
+      )}
     </View>
   );
 };
@@ -128,4 +132,3 @@ const styles = StyleSheet.create({
 });
 
 export default LogsScreen;
-

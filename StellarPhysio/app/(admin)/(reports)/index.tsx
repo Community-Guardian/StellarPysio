@@ -1,13 +1,13 @@
+// StellarPhysio/app/(admin)/(reports)/index.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Button from '@/components/Button';
 import { useLogs } from '@/context/LogsContext';
-import { generatePDFReport } from '@/utils/pdfGenerator';
 
 const ReportsScreen = () => {
   const { logs, fetchLogs, loading } = useLogs();
-  const [selectedReport, setSelectedReport] = useState('userActivity');
+  const [selectedReport, setSelectedReport] = useState('info');
   const [selectedTimeFrame, setSelectedTimeFrame] = useState('lastWeek');
   const [filteredLogs, setFilteredLogs] = useState([]);
 
@@ -44,14 +44,12 @@ const ReportsScreen = () => {
     setFilteredLogs(filtered);
   };
 
-  const generateReport = async () => {
-    try {
-      const reportData = filteredLogs.filter(log => log.level === selectedReport.toUpperCase());
-      await generatePDFReport(reportData, selectedReport, selectedTimeFrame);
-      Alert.alert('Report Generated', 'The report has been generated successfully.');
-    } catch (error) {
-      console.error('Error generating report:', error);
-      Alert.alert('Error', 'Failed to generate the report. Please try again.');
+  const generateReport = () => {
+    const reportData = filteredLogs.filter(log => log.log_type === selectedReport.toUpperCase());
+    if (reportData.length === 0) {
+      Alert.alert('No Data', 'No logs found for the selected report type and time frame.');
+    } else {
+      setFilteredLogs(reportData);
     }
   };
 
@@ -65,9 +63,10 @@ const ReportsScreen = () => {
           onValueChange={(itemValue) => setSelectedReport(itemValue)}
           style={styles.picker}
         >
-          <Picker.Item label="Information" value="Info" />
-          <Picker.Item label="Warnings" value="warning" />
-          <Picker.Item label="Errors" value="error" />
+
+          <Picker.Item label="Information" value="INFO" />
+          <Picker.Item label="Warnings" value="WARNING" />
+          <Picker.Item label="Errors" value="ERROR" />
         </Picker>
       </View>
       <View style={styles.pickerContainer}>
@@ -88,11 +87,26 @@ const ReportsScreen = () => {
         onPress={generateReport}
         style={styles.generateButton}
       />
-      <View style={styles.reportPreview}>
-        <Text style={styles.previewTitle}>Report Preview</Text>
-        <Text style={styles.previewContent}>
-          Report data will be displayed here after generation.
-        </Text>
+      <View style={styles.reportContainer}>
+        <Text style={styles.reportTitle}>Report Data</Text>
+        {filteredLogs.length > 0 ? (
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableHeader}>Timestamp</Text>
+              <Text style={styles.tableHeader}>Level</Text>
+              <Text style={styles.tableHeader}>Message</Text>
+            </View>
+            {filteredLogs.map((log, index) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={styles.tableCell}>{log.timestamp}</Text>
+                <Text style={styles.tableCell}>{log.log_type}</Text>
+                <Text style={styles.tableCell}>{log.details}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.noDataText}>No data available for the selected criteria.</Text>
+        )}
       </View>
     </ScrollView>
   );
@@ -128,20 +142,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A90E2',
     marginBottom: 20,
   },
-  reportPreview: {
+  reportContainer: {
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 15,
   },
-  previewTitle: {
+  reportTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 10,
   },
-  previewContent: {
+  table: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tableHeader: {
+    flex: 1,
+    fontWeight: 'bold',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+  },
+  tableCell: {
+    flex: 1,
+    padding: 10,
+  },
+  noDataText: {
     fontSize: 14,
     color: '#666',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

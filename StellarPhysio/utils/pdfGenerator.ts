@@ -1,38 +1,32 @@
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-import logo from '../assets/logo.png'; // Ensure you have a logo image in the assets folder
+import { PDFDocument, PDFPage } from 'react-native-pdf-lib';
 
-export const generatePDFReport = async (reportData: any[], reportType: string, timeFrame: string) => {
-  const doc = new jsPDF();
+export const generatePDFReport = async (
+  reportData: any[],
+  reportType: string,
+  timeFrame: string
+): Promise<string> => {
+  try {
+    const headerText = `${reportType} Report\nTime Frame: ${timeFrame}`;
+    const rows = reportData
+      .map(
+        (log, index) =>
+          `${index + 1}. ${log.timestamp} - [${log.level}] ${log.message}`
+      )
+      .join('\n');
 
-  // Add logo
-  const img = new Image();
-  img.src = logo;
-  doc.addImage(img, 'PNG', 10, 10, 50, 20);
+    const page = PDFPage.create()
+      .setMediaBox(595, 842) // A4 size
+      .drawText(headerText, { x: 50, y: 780, fontSize: 16 })
+      .drawText(rows, { x: 50, y: 700, fontSize: 12, width: 500, lineHeight: 15 });
 
-  // Add title
-  doc.setFontSize(18);
-  doc.text(`Report: ${reportType}`, 70, 20);
-  doc.setFontSize(12);
-  doc.text(`Time Frame: ${timeFrame}`, 70, 30);
+    const pdfPath = await PDFDocument.create('Documents/Report.pdf')
+      .addPages(page)
+      .write();
 
-  // Add table
-  const tableColumn = ['Timestamp', 'Level', 'Message'];
-  const tableRows: any[] = [];
-
-  reportData.forEach(log => {
-    const logData = [log.timestamp, log.level, log.message];
-    tableRows.push(logData);
-  });
-
-  doc.autoTable({
-    head: [tableColumn],
-    body: tableRows,
-    startY: 40,
-    theme: 'grid',
-    headStyles: { fillColor: [58, 135, 173] },
-  });
-
-  // Save the PDF
-  doc.save(`${reportType}_report_${timeFrame}.pdf`);
+    console.log('PDF generated at:', pdfPath);
+    return pdfPath;
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
 };

@@ -178,11 +178,19 @@ const DashboardScreen: React.FC = () => {
               </View>
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={toggleMenu}>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+              setMenuVisible(false); // Close the menu
+              await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
+              router.push('/(tabs)/(more)/AboutUsScreen'); // Redirect to the desired screen
+            }}>
             <Ionicons name="information-circle" size={20} color="#333" />
             <Text style={styles.menuText}>About Us</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={toggleMenu}>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+              setMenuVisible(false); // Close the menu
+              await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
+              router.push('/(tabs)/(more)/HelpScreen'); // Redirect to the desired screen
+            }}>
             <Ionicons name="help-circle" size={20} color="#333" />
             <Text style={styles.menuText}>Help</Text>
           </TouchableOpacity>

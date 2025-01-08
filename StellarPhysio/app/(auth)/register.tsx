@@ -90,7 +90,7 @@ const RegistrationScreen: React.FC = () => {
       <Text style={styles.termsText}>Kindly ensure passwords match</Text>
       <View style={styles.loginPrompt}>
         <Text style={styles.loginText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => console.log('Navigate to login')}>
+        <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
           <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
