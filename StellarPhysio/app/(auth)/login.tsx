@@ -16,7 +16,6 @@ const LoginScreen: React.FC = () => {
   const handleLogin = async () => {
     try {
       await login(email, password);
-      router.push('/(tabs)/(dashboard)');
     } catch (error) {
       Alert.alert('Login Error', 'Invalid email or password. Please try again.');
     }

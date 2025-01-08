@@ -32,7 +32,6 @@ const ProfileScreen: React.FC = () => {
       console.error('Error saving profile:', error);
     }
   };
-  console.log(user);
   
 
   return (

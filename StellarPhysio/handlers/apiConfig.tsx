@@ -4,7 +4,7 @@ const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environme
 // const BASE_URL = 'http://127.0.0.1:8000'; // Update this as per your environment
 
 // User endpoints
-export const GET_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk/`;
+export const GET_INDIVIDUAL_URL = `${BASE_URL}/users/`;
 export const UPDATE_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk/`;
 export const SIGN_UP_URL = `${BASE_URL}/register/`;
 export const REFRESH_TOKEN = `${BASE_URL}/token/refresh/`;

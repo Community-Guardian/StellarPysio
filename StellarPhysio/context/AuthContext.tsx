@@ -11,7 +11,7 @@ import {
   deleteEmergencyContact,
 } from '@/handlers/api'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useRouter } from 'expo-router';
 // Define the shape of our AuthContext
 interface AuthContextData {
   user: any;
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
+  const  router  = useRouter();
   // Function to fetch user details
   const refreshUserData = async () => {
     const token = await AsyncStorage.getItem('accessToken');
@@ -62,8 +62,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userData = await getIndividual();
         setUser((prevUser:any) => ({
           ...prevUser,
-          details: userData, // Update user details
+          details: userData[0], // Update user details
         }));
+        console.log(userData[0])
+        if (userData[0].user_type === 'patient') {
+          router.push('/(tabs)/(dashboard)');
+        } else if (userData[0].user_type === 'admin') {
+          router.push('/(admin)/(dashboard)');
+        }
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -95,8 +101,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       const response = await loginUser(email, password);
-      setUser({ details: response.user, emergency_contacts: [] }); // Initialize with empty contacts
-      refreshUserData();
+      await setUser({ details: response.user, emergency_contacts: [] }); // Initialize with empty contacts
+      await refreshUserData();
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Login error:', error);
