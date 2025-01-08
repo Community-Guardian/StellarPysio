@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
 import { Link } from 'expo-router';
+import { useTheme } from '@/context/ThemeContext';
 
 const PREFERENCES_KEY = 'user_preferences';
 
@@ -20,6 +21,7 @@ const MoreScreen: React.FC = () => {
     notificationsEnabled: true,
     darkModeEnabled: false,
   });
+  const { theme, toggleTheme } = useTheme();
 
   // Load preferences on mount
   useEffect(() => {
@@ -48,10 +50,10 @@ const MoreScreen: React.FC = () => {
   };
 
   const menuItems = [
-    { icon: 'person-outline', title: 'Account Settings', route: '/account-settings' },
-    { icon: 'card-outline', title: 'Payment Methods', route: '/payment-methods' },
+    { icon: 'person-outline', title: 'Contact Us', route: '/ContactUsScreen' },
+    // { icon: 'card-outline', title: 'Payment Methods', route: '/payment-methods' },
     { icon: 'star-outline', title: 'Feedback', route: '/feedback' },
-    { icon: 'help-circle-outline', title: 'Help & Support', route: '/help-support' },
+    { icon: 'help-circle-outline', title: 'Help & Support', route: '/HelpScreen' },
     { icon: 'document-text-outline', title: 'Terms & Conditions', route: '/terms-conditions' },
     { icon: 'shield-checkmark-outline', title: 'Privacy Policy', route: '/privacy-policy' },
     { icon: 'log-out-outline', title: 'Log Out', route: '/logout' },
@@ -74,10 +76,10 @@ const MoreScreen: React.FC = () => {
         <View style={styles.preferenceItem}>
           <Text style={styles.preferenceText}>Dark Mode</Text>
           <Switch
-            value={preferences.darkModeEnabled}
-            onValueChange={(value) => updatePreferences('darkModeEnabled', value)}
+            value={theme === 'dark'}
+            onValueChange={toggleTheme}
             trackColor={{ false: colors.lightText, true: colors.primary }}
-            thumbColor={preferences.darkModeEnabled ? colors.white : colors.background}
+            thumbColor={theme === 'dark' ? colors.white : colors.background}
           />
         </View>
       </View>

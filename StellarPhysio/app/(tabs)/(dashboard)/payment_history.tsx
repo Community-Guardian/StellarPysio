@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { usePayments } from '@/context/PaymentContext';
+import { useServices } from '@/context/ServicesContext';
 import Button from '@/components/Button';
 
 interface Payment {
@@ -10,6 +11,10 @@ interface Payment {
     id: number;
     name: string;
     description: string;
+    service_type: {
+      id: number;
+      name: string;
+    };
   };
   service_type: string;
   payment_method: string;
@@ -25,10 +30,12 @@ interface Payment {
 
 const PaymentsScreen: React.FC = () => {
   const { fetchPayments, payments, loading, createPaymentIntent } = usePayments();
+  const { services, fetchServices } = useServices();
   const [phoneNumber, setPhoneNumber] = useState('');
 
   useEffect(() => {
     fetchPayments();
+    fetchServices();
   }, []);
 
   const handlePayNow = (serviceId: string) => {
@@ -66,7 +73,7 @@ const PaymentsScreen: React.FC = () => {
       <Text style={styles.paymentDescription}>{item.service.description}</Text>
       <View style={styles.paymentFooter}>
         <Text style={styles.paymentDate}>{new Date(item.created_at).toLocaleDateString()}</Text>
-        {item.payment_status === 'incomplete' && (
+        {item.payment_status === 'incomplete' && item.service.service_type.name === 'Prescriptions' && (
           <TouchableOpacity
             style={styles.payNowButton}
             onPress={() => handlePayNow(item.service.id.toString())}
@@ -149,9 +156,10 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   paymentHeader: {
     flexDirection: 'row',
@@ -161,12 +169,10 @@ const styles = StyleSheet.create({
   paymentTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#212529',
   },
   paymentAmount: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#007bff',
+    color: '#6c757d',
   },
   paymentDescription: {
     fontSize: 14,

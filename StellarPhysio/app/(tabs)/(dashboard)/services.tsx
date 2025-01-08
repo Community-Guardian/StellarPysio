@@ -1,60 +1,106 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useServices } from '@/context/ServicesContext'; // Ensure proper import path
+import { usePayments } from '@/context/PaymentContext'; // Ensure proper import path
 
 interface Service {
   id: string;
   name: string;
   description: string;
+  price: string;
+  service_type: {
+    name: string;
+  };
 }
 
 const ServicesScreen: React.FC = () => {
+  const router = useRouter();
+  const { services, fetchServices, loading } = useServices();
+  const { createPaymentIntent } = usePayments();
   const [searchQuery, setSearchQuery] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-  const services: Service[] = [
-    { id: '1', name: 'Manual Therapy', description: 'Hands-on treatment to manipulate joints and soft tissue.' },
-    { id: '2', name: 'Sports Therapy', description: 'Specialized treatment for sports-related injuries and performance enhancement.' },
-    { id: '3', name: 'Rehabilitation', description: 'Comprehensive programs to restore function after injury or surgery.' },
-    { id: '4', name: 'Massage Therapy', description: 'Therapeutic massage to relieve muscle tension and promote relaxation.' },
-  ];
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const handlePayNow = (serviceId: string) => {
+    Alert.prompt(
+      "Enter Phone Number",
+      "Please enter your M-Pesa phone number",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: (number: string | undefined) => {
+            if (number) {
+              setPhoneNumber(number);
+              createPaymentIntent(serviceId, number)
+                .then(() => Alert.alert("Payment Initiated", "Please check your phone for the M-Pesa prompt."))
+                .catch((error) => Alert.alert("Error", "Failed to initiate payment. Please try again."));
+            }
+          }
+        }
+      ],
+      "plain-text"
+    );
+  };
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  console.log(filteredServices);
   const renderServiceItem = ({ item }: { item: Service }) => (
     <View style={styles.serviceCard}>
       <Text style={styles.serviceName}>{item.name}</Text>
       <Text style={styles.serviceDescription}>{item.description}</Text>
       <View style={styles.serviceActions}>
-        <TouchableOpacity style={styles.learnMoreButton}>
-          <Text style={styles.buttonText}>Learn More</Text>
+        <TouchableOpacity style={styles.priceButton}>
+          <Text style={styles.buttonText}>Price(ksh): {item.price}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.bookNowButton}>
-          <Text style={styles.buttonText}>Book Now</Text>
-        </TouchableOpacity>
+        {item.serviceType === 'Prescriptions' ? (
+          <TouchableOpacity style={styles.payNowButton} onPress={() => handlePayNow(item.id)}>
+            <Text style={styles.buttonText}>Pay Now</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.bookNowButton} onPress={() => { router.push(`/book_appointment?serviceId=${item.id}`) }}>
+            <Text style={styles.buttonText}>Book Now</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Our Services</Text>
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={24} color="#777777" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search services"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-      <FlatList
-        data={filteredServices}
-        renderItem={renderServiceItem}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search services..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
       />
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading services...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredServices}
+          renderItem={renderServiceItem}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No services found</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -62,67 +108,82 @@ const ServicesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f9fa',
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+  searchBar: {
+    height: 40,
+    backgroundColor: '#ffffff',
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginBottom: 16,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 8,
+    paddingHorizontal: 12,
     fontSize: 16,
-    color: '#333',
+    marginBottom: 16,
   },
   serviceCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   serviceName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 8,
   },
   serviceDescription: {
     fontSize: 14,
-    color: '#777',
-    marginBottom: 16,
+    color: '#6c757d',
+    marginBottom: 8,
   },
   serviceActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  learnMoreButton: {
-    backgroundColor: '#4A90E2',
+  priceButton: {
+    backgroundColor: '#17a2b8',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   bookNowButton: {
-    backgroundColor: '#50C878',
+    backgroundColor: '#28a745',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 4,
+  },
+  payNowButton: {
+    backgroundColor: '#ffc107',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
     fontSize: 14,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6c757d',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6c757d',
   },
 });
 

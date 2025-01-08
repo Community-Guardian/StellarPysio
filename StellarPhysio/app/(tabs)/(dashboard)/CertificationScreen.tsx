@@ -1,22 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'react-native';
 import Button from '@/components/Button';
+import { useAchievements } from '@/context/AchievementsContext';
 
-interface Certificate {
-  id: string;
-  title: string;
-  date: string;
-  imageUrl: string;
-}
+const CertificationScreen: React.FC = () => {
+  const { achievements, fetchAchievements, loading } = useAchievements();
 
-const CertificationScreen = () => {
-  const [certificates, setCertificates] = useState<Certificate[]>([
-    { id: '1', title: 'Wellness Coaching Level 1', date: '2023-04-15', imageUrl: 'https://example.com/cert1.jpg' },
-    { id: '2', title: 'Nutrition Fundamentals', date: '2023-03-20', imageUrl: 'https://example.com/cert2.jpg' },
-    { id: '3', title: 'Advanced Physiotherapy Techniques', date: '2023-02-10', imageUrl: 'https://example.com/cert3.jpg' },
-  ]);
+  useEffect(() => {
+    fetchAchievements();
+  }, []);
 
-  const renderCertificate = ({ item }: { item: Certificate }) => (
+  const renderCertificate = ({ item }: { item: Achievement }) => (
     <View style={styles.certificateItem}>
       <Image source={{ uri: item.imageUrl }} style={styles.certificateImage} />
       <View style={styles.certificateInfo}>
@@ -34,11 +28,15 @@ const CertificationScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Certifications</Text>
-      <FlatList
-        data={certificates}
-        renderItem={renderCertificate}
-        keyExtractor={item => item.id}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={achievements}
+          renderItem={renderCertificate}
+          keyExtractor={item => item.id}
+        />
+      )}
       <Button
         title="Upload New Certificate"
         onPress={() => {/* Implement upload new certificate logic */}}
@@ -99,4 +97,3 @@ const styles = StyleSheet.create({
 });
 
 export default CertificationScreen;
-

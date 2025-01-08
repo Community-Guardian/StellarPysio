@@ -15,7 +15,7 @@ class ServiceType(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255, verbose_name=_('Service Name'))
-    service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE, related_name='services', verbose_name=_('Service Type'))
+    service_type = models.ForeignKey(ServiceType, on_delete=models.CASCADE, related_name='services', verbose_name=_('Service Type') ,blank=True,null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Price'))
     description = models.TextField(blank=True, null=True, verbose_name=_('Description'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is Active'))

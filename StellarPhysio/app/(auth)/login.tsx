@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import Button from '@/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/AuthContext'; // Import useAuth
+
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter()
-  const handleLogin = () => {
-    console.log('Login button pressed');
-    router.push('/(tabs)/(dashboard)')
+  const { login, loading } = useAuth(); // Destructure login and loading from AuthContext
+  const router = useRouter();
+
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
+      router.push('/(tabs)/(dashboard)');
+    } catch (error) {
+      Alert.alert('Login Error', 'Invalid email or password. Please try again.');
+    }
   };
 
   return (
@@ -46,7 +54,7 @@ const LoginScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <Button title="Login" onPress={handleLogin} />
+      <Button title="Login" onPress={handleLogin} disabled={loading} />
       <Link href="/forgot-password" asChild>
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>

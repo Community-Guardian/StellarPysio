@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+// StellarPhysio/app/(tabs)/(dashboard)/index.tsx
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   StyleSheet,
   Modal,
   Pressable,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { Link } from 'expo-router';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import Fontisto from '@expo/vector-icons/Fontisto';
 import { useRouter } from 'expo-router';
+import { useNotifications } from '@/context/NotificationContext';
+import SearchBar from '@/components/SearchBar'; // Import the SearchBar component
+import {useAuth} from '@/context/AuthContext';
 interface QuickAccessTile {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
@@ -19,25 +25,64 @@ interface QuickAccessTile {
 }
 
 interface Notification {
+  id: number;
+  notification_type: NotificationType;
   title: string;
   message: string;
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+  user: string;
 }
 
 const DashboardScreen: React.FC = () => {
   const [menuVisible, setMenuVisible] = useState(false);
-  const unreadNotifications = 2; // Example unread notifications count
+  const { notifications, fetchNotifications, markNotificationAsRead, loading } = useNotifications();
+  const unreadNotifications = notifications.filter(notification => !notification.is_read).length;
   const router = useRouter();
+  const { user } = useAuth();
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
   const quickAccessTiles: QuickAccessTile[] = [
     { title: 'My Appointments', icon: 'list', screen: 'appointments' },
     { title: 'Services', icon: 'medical', screen: 'services' },
-    { title: 'My Archievments', icon: 'star', screen: 'CertificationScreen' },
+    { title: 'My Achievements', icon: 'star', screen: 'CertificationScreen' },
     { title: 'Articles', icon: 'book', screen: 'articles' },
   ];
 
-  const notifications: Notification[] = [
-    { title: 'Appointment Reminder', message: 'You have an appointment tomorrow at 2 PM.' },
-    { title: 'New Service', message: 'Try our new sports therapy service!' },
-  ];
+  const markAllAsRead = () => {
+    notifications.forEach(notification => {
+      if (!notification.is_read) {
+        markNotificationAsRead(notification.id);
+      }
+    });
+  };
+
+  const markAsRead = (id: number) => {
+    markNotificationAsRead(id);
+  };
+
+  const renderNotificationItem = ({ item }: { item: Notification }) => (
+    <TouchableOpacity style={styles.card}>
+      <View style={styles.cardContent}>
+        {!item.read && <View style={styles.unreadDot} />}
+        <View style={styles.textContainer}>
+          <Text style={styles.cardTitle}>
+            <Text style={styles.boldText}>{item.title}</Text> {item.message}
+          </Text>
+          <Text style={styles.timestamp}>{item.timestamp}</Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => markAsRead(item.id)} // Mark as read when the dots are pressed
+      >
+        <MaterialCommunityIcons name="dots-vertical" size={20} color="#666" />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -48,13 +93,9 @@ const DashboardScreen: React.FC = () => {
       <ScrollView style={styles.scrollView}>
         {/* Search and Menu */}
         <View style={styles.headerContainer}>
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Search for places..."
-            placeholderTextColor="#aaa"
-          />
+          <SearchBar /> {/* Integrate the SearchBar component */}
           <TouchableOpacity onPress={toggleMenu}>
-            <MaterialIcons name="more-vert" size={24} color="#333" />
+            <MaterialCommunityIcons name="dots-vertical" size={24} color="#333" />
             {unreadNotifications > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{unreadNotifications}</Text>
@@ -62,7 +103,7 @@ const DashboardScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
-        <Text style={styles.welcomeText}>Welcome, John!</Text>
+        <Text style={styles.welcomeText}>Welcome, {user?.details?.username}!</Text>
         <View style={styles.tilesContainer}>
           {quickAccessTiles.map((tile, index) => (
             <Link key={index} href={`/${tile.screen}`} asChild>
@@ -73,14 +114,27 @@ const DashboardScreen: React.FC = () => {
             </Link>
           ))}
         </View>
+        {/* Notifications */}
         <View style={styles.notificationsContainer}>
           <Text style={styles.notificationsTitle}>Notifications</Text>
-          {notifications.map((notification, index) => (
-            <View key={index} style={styles.notification}>
-              <Text style={styles.notificationTitle}>{notification.title}</Text>
-              <Text style={styles.notificationMessage}>{notification.message}</Text>
-            </View>
-          ))}
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <>
+              <FlatList
+                data={notifications}
+                renderItem={renderNotificationItem}
+                keyExtractor={item => item.id}
+                style={styles.list}
+                ListEmptyComponent={<Text style={styles.emptyMessage}>No notifications available</Text>}
+              />
+              {unreadNotifications > 0 && (
+                <TouchableOpacity style={styles.markAllButton} onPress={markAllAsRead}>
+                  <Text style={styles.markAllText}>Mark all as read</Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
         </View>
       </ScrollView>
       {/* Dropdown Menu Modal */}
@@ -88,22 +142,21 @@ const DashboardScreen: React.FC = () => {
         <Pressable style={styles.modalOverlay} onPress={toggleMenu} />
         <View style={styles.menu}>
           <TouchableOpacity
-                style={styles.menuItem}
-                onPress={async () => {
-                  setMenuVisible(false); // Close the menu
-                  await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
-                  router.push('/(tabs)/(dashboard)/NotificationsScreen'); // Redirect to the desired screen
-                }}
-              >
-                <Ionicons name="notifications" size={20} color="#333" />
-                <Text style={styles.menuText}>Notifications</Text>
-                {unreadNotifications > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{unreadNotifications}</Text>
-                  </View>
-                )}
-            </TouchableOpacity>
-
+            style={styles.menuItem}
+            onPress={async () => {
+              setMenuVisible(false); // Close the menu
+              await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
+              router.push('/(tabs)/(dashboard)/NotificationsScreen'); // Redirect to the desired screen
+            }}
+          >
+            <Ionicons name="notifications" size={20} color="#333" />
+            <Text style={styles.menuText}>Notifications</Text>
+            {unreadNotifications > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadNotifications}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem} onPress={toggleMenu}>
             <Ionicons name="information-circle" size={20} color="#333" />
             <Text style={styles.menuText}>About Us</Text>
@@ -132,20 +185,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-  },
-  searchBar: {
-    flex: 1,
-    height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 14,
-    color: '#333',
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   badge: {
     position: 'absolute',
@@ -196,6 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
+    marginBottom: 24,
   },
   notificationsTitle: {
     fontSize: 18,
@@ -203,34 +243,61 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
   },
-  notification: {
-    marginBottom: 16,
+  list: {
+    maxHeight: 200,
   },
-  notificationTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+  card: {
+    flexDirection: 'row',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  notificationMessage: {
+  cardContent: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#6c4fff',
+    marginRight: 12,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  cardTitle: {
     fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  timestamp: {
+    fontSize: 12,
     color: '#999',
   },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 8,
+  menuButton: {
+    padding: 5,
+  },
+  markAllButton: {
+    padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: '#f0f0f0',
   },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
-    fontSize: 12,
+  markAllText: {
     color: '#333',
-    marginTop: 4,
+    fontSize: 14,
+    textAlign: 'left',
+  },
+  emptyMessage: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#999',
   },
   modalOverlay: {
     flex: 1,

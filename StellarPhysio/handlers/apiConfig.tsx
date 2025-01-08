@@ -1,10 +1,10 @@
 // Base URL configurations
-const BASE_URL = 'https://stellarphysio.pythonanywhere.com'; // Update this as per your environment
-// const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environment
+// const BASE_URL = 'https://stellarphysio.pythonanywhere.com'; // Update this as per your environment
+const BASE_URL = 'http://192.168.0.105:80'; // Update this as per your environment
 // const BASE_URL = 'http://127.0.0.1:8000'; // Update this as per your environment
 
 // User endpoints
-export const GET_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk`;
+export const GET_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk/`;
 export const UPDATE_INDIVIDUAL_URL = `${BASE_URL}/Patients/pk/`;
 export const SIGN_UP_URL = `${BASE_URL}/register/`;
 export const REFRESH_TOKEN = `${BASE_URL}/token/refresh/`;
@@ -27,6 +27,11 @@ export const APPOINTMENTS_URL = `${BASE_URL}/appointments/`;
 
 //  endpoints for Service management
 export const SERVICES_URL = `${BASE_URL}/services/`;
+
+// Base URL for articles
+export const ARTICLES_URL = `${BASE_URL}/articles/`;
+// Base URL for achievements
+export const ACHIEVEMENTS_URL = `${BASE_URL}/achievements/`;
 
 // Exporting BASE_URL for external use
 export { BASE_URL };

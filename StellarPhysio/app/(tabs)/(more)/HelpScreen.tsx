@@ -1,17 +1,23 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Button from '../../../components/Button';
+import Button from '@/components/Button';
+import {useRouter} from 'expo-router';
+const HelpScreen: React.FC = () => {
+  const [showFAQs, setShowFAQs] = useState(false);
 
-const HelpScreen = () => {
   const helpTopics = [
-    { title: 'How to Book an Appointment', icon: 'calendar' },
-    { title: 'Understanding Your Treatment Plan', icon: 'medical' },
-    { title: 'Accessing Your Health Records', icon: 'document-text' },
-    { title: 'Payment and Billing', icon: 'card' },
     { title: 'Contacting Your Healthcare Provider', icon: 'call' },
+    { title: 'Managing Your Appointments', icon: 'calendar' },
+    { title: 'Using the App Features', icon: 'apps' },
   ];
 
+  const faqs = [
+    { question: 'How do I book an appointment?', answer: 'To book an appointment, go to the Appointments tab and select "Book Appointment".' },
+    { question: 'How do I contact support?', answer: 'You can contact support by clicking the "Contact Support" button on this screen.' },
+    { question: 'How do I reset my password?', answer: 'To reset your password, go to the Profile tab and select "Reset Password".' },
+  ];
+  const router = useRouter();
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Help Center</Text>
@@ -23,14 +29,22 @@ const HelpScreen = () => {
       ))}
       <Button
         title="Contact Support"
-        onPress={() => {/* Implement contact support logic */}}
+        onPress={() => { router.push('/ContactUsScreen') }}
         style={styles.supportButton}
       />
-      <Button
-        title="FAQs"
-        onPress={() => {/* Navigate to FAQs screen */}}
-        style={styles.faqButton}
-      />
+      <TouchableOpacity onPress={() => setShowFAQs(!showFAQs)} style={styles.faqButton}>
+        <Text style={styles.faqButtonText}>{showFAQs ? 'Hide FAQs' : 'Show FAQs'}</Text>
+      </TouchableOpacity>
+      {showFAQs && (
+        <View style={styles.faqContainer}>
+          {faqs.map((faq, index) => (
+            <View key={index} style={styles.faqItem}>
+              <Text style={styles.faqQuestion}>{faq.question}</Text>
+              <Text style={styles.faqAnswer}>{faq.answer}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -38,39 +52,59 @@ const HelpScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#F5F8FA',
+    backgroundColor: '#f8f9fa',
+    padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
+    color: '#212529',
+    marginBottom: 16,
   },
   topicItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: 16,
   },
   topicIcon: {
-    marginRight: 15,
+    marginRight: 12,
   },
   topicTitle: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 18,
+    color: '#212529',
   },
   supportButton: {
-    marginTop: 20,
+    marginTop: 16,
     backgroundColor: '#4A90E2',
   },
   faqButton: {
-    marginTop: 10,
-    backgroundColor: '#4CAF50',
+    marginTop: 16,
+    backgroundColor: '#4A90E2',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  faqButtonText: {
+    fontSize: 16,
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  faqContainer: {
+    marginTop: 16,
+  },
+  faqItem: {
+    marginBottom: 16,
+  },
+  faqQuestion: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#212529',
+  },
+  faqAnswer: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginTop: 4,
   },
 });
 
 export default HelpScreen;
-

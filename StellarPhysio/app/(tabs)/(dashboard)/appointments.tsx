@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppointments } from '@/context/AppointmentContext'; // Ensure proper import path
+
 interface Service {
   id: number;
   name: string;
@@ -11,6 +12,7 @@ interface Service {
   description: string;
   isActive: boolean;
 }
+
 // Define the appointment object structure
 interface Appointment {
   id: number;
@@ -24,6 +26,7 @@ interface Appointment {
   service: Service;
   service_id: string;
 }
+
 const AppointmentsScreen: React.FC = () => {
   const router = useRouter();
   const { appointments, loading, fetchAppointments, removeAppointment } = useAppointments();
@@ -54,7 +57,7 @@ const AppointmentsScreen: React.FC = () => {
         <Text style={styles.status}>{item.status}</Text>
       </View>
       <Text style={styles.time}>{new Date(item.date_time).toLocaleTimeString()}</Text>
-      <Text style={styles.service}>{item.reason}</Text>
+      <Text style={styles.service}>{item.service.name}</Text>
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.rescheduleButton}
@@ -77,7 +80,7 @@ const AppointmentsScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }

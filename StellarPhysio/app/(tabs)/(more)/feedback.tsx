@@ -3,24 +3,29 @@ import { View, Text, TextInput, StyleSheet, ScrollView, Alert } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/utils/colors';
 import Button from '@/components/Button';
+import { useFeedback } from '@/context/FeedbackContext'; // Ensure proper import path
 
 const FeedbackScreen: React.FC = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const { submitFeedback } = useFeedback(); // Destructure submitFeedback from FeedbackContext
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating === 0) {
       Alert.alert('Error', 'Please select a rating before submitting.');
       return;
     }
 
-    // Here you would typically send the feedback to your backend
-    console.log('Submitting feedback:', { rating, comment });
-    Alert.alert('Thank You!', 'Your feedback has been submitted successfully.');
-    
-    // Reset form
-    setRating(0);
-    setComment('');
+    try {
+      await submitFeedback({ rating, comment });
+      Alert.alert('Thank You!', 'Your feedback has been submitted successfully.');
+      
+      // Reset form
+      setRating(0);
+      setComment('');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to submit feedback. Please try again.');
+    }
   };
 
   return (
@@ -112,4 +117,3 @@ const styles = StyleSheet.create({
 });
 
 export default FeedbackScreen;
-

@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,11 +7,16 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 
 import { AuthProvider } from '@/context/AuthContext';
 import { PaymentProvider } from '@/context/PaymentContext';
 import { AppointmentProvider } from '@/context/AppointmentContext';
 import { ServicesProvider } from '@/context/ServicesContext';
+import { ArticlesProvider } from '@/context/ArticlesContext';
+import { FeedbackProvider } from '@/context/FeedbackContext';
+import { NotificationProvider } from '@/context/NotificationContext';
+import { AchievementsProvider } from '@/context/AchievementsContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,23 +38,31 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <PaymentProvider>
-          <AppointmentProvider>
-            <ServicesProvider>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-                <Stack.Screen name="+not-found" />
-              </Stack>
-            </ServicesProvider>
-          </AppointmentProvider>
-        </PaymentProvider>
-      </AuthProvider>
-      <StatusBar style="auto" />
+    <ThemeProvider>
+        <AuthProvider>
+          <PaymentProvider>
+            <AppointmentProvider>
+              <ServicesProvider>
+                <ArticlesProvider>
+                  <FeedbackProvider>
+                    <NotificationProvider>
+                      <AchievementsProvider>
+                        <Stack>
+                          <Stack.Screen name="index" options={{ headerShown: false }} />
+                          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                          <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+                          <Stack.Screen name="+not-found" />
+                        </Stack>
+                      </AchievementsProvider>
+                    </NotificationProvider>
+                  </FeedbackProvider>
+                </ArticlesProvider>
+              </ServicesProvider>
+            </AppointmentProvider>
+          </PaymentProvider>
+        </AuthProvider>
+        <StatusBar style="auto" />
     </ThemeProvider>
   );
 }

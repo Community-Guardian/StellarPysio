@@ -96,6 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const response = await loginUser(email, password);
       setUser({ details: response.user, emergency_contacts: [] }); // Initialize with empty contacts
+      refreshUserData();
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Login error:', error);
