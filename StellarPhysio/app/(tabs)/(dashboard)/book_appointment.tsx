@@ -55,19 +55,33 @@ const BookAppointmentScreen: React.FC = () => {
       Alert.alert('Validation Error', 'Please select a service.');
       return;
     }
-
+  
+    if (!isFutureDate(date)) {
+      Alert.alert('Validation Error', 'Please select a future date.');
+      return;
+    }
+  
     try {
+      // Create a new Date object combining the date and time
+      const combinedDateTime = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes()
+      );
+  
+      if (!isFutureDate(combinedDateTime)) {
+        Alert.alert('Validation Error', 'Please select a future date and time.');
+        return;
+      }
+  
       const newAppointment: Appointment = {
-        date_time: new Date(`${date.toDateString()} ${time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`).toISOString(), // Combining date and time into ISO format
+        date_time: combinedDateTime.toISOString(), // Ensure valid ISO string
         reason: notes,
         service_id: service,
       };
-
-      if (!isFutureDate(date)) {
-        Alert.alert('Validation Error', 'Please select a future date.');
-        return;
-      }
-
+  
       await addAppointment(newAppointment);
       Alert.alert('Success', 'Appointment booked successfully!');
       router.back();
@@ -76,6 +90,7 @@ const BookAppointmentScreen: React.FC = () => {
       Alert.alert('Error', 'Failed to book appointment. Please try again.');
     }
   };
+  
 
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">

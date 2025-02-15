@@ -40,6 +40,7 @@ interface Notification {
   created_at: string;
   updated_at: string;
   user: string;
+  timestamp: string;
 }
 
 const DashboardScreen: React.FC = () => {
@@ -88,7 +89,7 @@ const DashboardScreen: React.FC = () => {
   const renderNotificationItem = ({ item }: { item: Notification }) => (
     <TouchableOpacity style={styles.card}>
       <View style={styles.cardContent}>
-        {!item.read && <View style={styles.unreadDot} />}
+        {!item.is_read && <View style={styles.unreadDot} />}
         <View style={styles.textContainer}>
           <Text style={styles.cardTitle}>
             <Text style={styles.boldText}>{item.title}</Text> {item.message}
@@ -167,7 +168,7 @@ const DashboardScreen: React.FC = () => {
             onPress={async () => {
               setMenuVisible(false); // Close the menu
               await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
-              router.push('/(tabs)/(dashboard)/NotificationsScreen'); // Redirect to the desired screen
+              router.navigate('/(tabs)/(dashboard)/NotificationsScreen'); // Redirect to the desired screen
             }}
           >
             <Ionicons name="notifications" size={20} color="#333" />
@@ -181,7 +182,7 @@ const DashboardScreen: React.FC = () => {
           <TouchableOpacity style={styles.menuItem} onPress={async () => {
               setMenuVisible(false); // Close the menu
               await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
-              router.push('/(tabs)/(more)/AboutUsScreen'); // Redirect to the desired screen
+              router.navigate('/(tabs)/(dashboard)/AboutUsScreen'); // Redirect to the desired screen
             }}>
             <Ionicons name="information-circle" size={20} color="#333" />
             <Text style={styles.menuText}>About Us</Text>
@@ -189,7 +190,7 @@ const DashboardScreen: React.FC = () => {
           <TouchableOpacity style={styles.menuItem} onPress={async () => {
               setMenuVisible(false); // Close the menu
               await new Promise(resolve => setTimeout(resolve, 100)); // Slight delay for smooth UI transition
-              router.push('/(tabs)/(more)/HelpScreen'); // Redirect to the desired screen
+              router.navigate('/(tabs)/(dashboard)/HelpScreen'); // Redirect to the desired screen
             }}>
             <Ionicons name="help-circle" size={20} color="#333" />
             <Text style={styles.menuText}>Help</Text>

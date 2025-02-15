@@ -15,7 +15,11 @@ export default function AuthLayout() {
       <Stack.Screen
         name="register" // Matches with the signup.tsx screen
         options={{ title: 'Sign Up' }}
-      />
+      />      
+      <Stack.Screen
+      name="forgot-password" // Matches with the signup.tsx screen
+      options={{ title: 'Sign Up' }}
+    />
     </Stack>
   );
 }

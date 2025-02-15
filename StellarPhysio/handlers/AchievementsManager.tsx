@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError ,AxiosResponse} from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ACHIEVEMENTS_URL, BASE_URL, REFRESH_TOKEN } from './apiConfig';
 

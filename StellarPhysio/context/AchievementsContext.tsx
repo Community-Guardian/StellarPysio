@@ -11,11 +11,15 @@ import { useAuth } from '@/context/AuthContext';
 // Achievement Interface
 interface Achievement {
   id: string;
-  title: string;
   date: string;
-  imageUrl: string;
+  certification: Certification;
 }
+interface Certification{
+  description: string;
+  title: string;
+  image_url: string;
 
+}
 // Context Interface
 interface AchievementsContextData {
   achievements: Achievement[];

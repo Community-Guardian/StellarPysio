@@ -31,6 +31,8 @@ const DashboardScreenLayout = () => {
           headerBackVisible: true, // displays the back button
         }}
       />
+      <Stack.Screen name="HelpScreen" options={{ headerShown: true,headerTitle: 'Help',headerBackVisible: true ,}}/>
+      <Stack.Screen name="AboutUsScreen" options={{ headerShown: true,headerTitle: 'About Us' ,headerBackVisible: true ,}}/>
     </Stack>
   )
 }

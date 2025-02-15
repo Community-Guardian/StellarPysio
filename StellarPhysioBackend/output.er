@@ -1,0 +1,298 @@
+[account_emailaddress]
+    *id {label:"INTEGER"}
+    email {label:"VARCHAR(254)"}
+    primary {label:"BOOLEAN"}
+    user_id {label:"CHAR(32)"}
+    verified {label:"BOOLEAN"}
+[userManager_customuser]
+    *id {label:"CHAR(32)"}
+    contact_number {label:"VARCHAR(128)"}
+    date_joined {label:"DATETIME"}
+    email {label:"VARCHAR(254)"}
+    first_name {label:"VARCHAR(150)"}
+    image {label:"VARCHAR(100)"}
+    is_active {label:"BOOLEAN"}
+    is_admin {label:"BOOLEAN"}
+    is_staff {label:"BOOLEAN"}
+    is_superuser {label:"BOOLEAN"}
+    last_login {label:"DATETIME"}
+    last_name {label:"VARCHAR(150)"}
+    password {label:"VARCHAR(128)"}
+    user_type {label:"VARCHAR(50)"}
+    username {label:"VARCHAR(150)"}
+[account_emailconfirmation]
+    *id {label:"INTEGER"}
+    created {label:"DATETIME"}
+    email_address_id {label:"INTEGER"}
+    key {label:"VARCHAR(64)"}
+    sent {label:"DATETIME"}
+[achievements_achievement]
+    *id {label:"INTEGER"}
+    certification_id {label:"BIGINT"}
+    created_at {label:"DATETIME"}
+    date {label:"DATE"}
+    user_id {label:"CHAR(32)"}
+[achievements_certification]
+    *id {label:"INTEGER"}
+    description {label:"TEXT"}
+    image_url {label:"VARCHAR(500)"}
+    title {label:"VARCHAR(255)"}
+[appointments_appointment]
+    *id {label:"INTEGER"}
+    date_time {label:"DATETIME"}
+    duration {label:"INTEGER"}
+    end_time {label:"DATETIME"}
+    is_confirmed {label:"BOOLEAN"}
+    patient_id {label:"CHAR(32)"}
+    provider_id {label:"CHAR(32)"}
+    reason {label:"TEXT"}
+    service_id {label:"BIGINT"}
+    status {label:"VARCHAR(10)"}
+[services_service]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    description {label:"TEXT"}
+    is_active {label:"BOOLEAN"}
+    name {label:"VARCHAR(255)"}
+    price {label:"DECIMAL"}
+    service_type_id {label:"BIGINT"}
+    updated_at {label:"DATETIME"}
+[services_servicetype]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    name {label:"VARCHAR(50)"}
+    updated_at {label:"DATETIME"}
+[articles_article]
+    *id {label:"INTEGER"}
+    article_type_id {label:"BIGINT"}
+    content {label:"TEXT"}
+    cover_image {label:"VARCHAR(100)"}
+    created_at {label:"DATETIME"}
+    is_published {label:"BOOLEAN"}
+    medical_condition {label:"VARCHAR(255)"}
+    tags {label:"VARCHAR(255)"}
+    title {label:"VARCHAR(255)"}
+    updated_at {label:"DATETIME"}
+    user_id {label:"CHAR(32)"}
+[articles_articletype]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    description {label:"TEXT"}
+    icon {label:"VARCHAR(100)"}
+    name {label:"VARCHAR(100)"}
+[auth_group]
+    *id {label:"INTEGER"}
+    name {label:"VARCHAR(150)"}
+[auth_group_permissions]
+    *id {label:"INTEGER"}
+    group_id {label:"INTEGER"}
+    permission_id {label:"INTEGER"}
+[auth_permission]
+    *id {label:"INTEGER"}
+    codename {label:"VARCHAR(100)"}
+    content_type_id {label:"INTEGER"}
+    name {label:"VARCHAR(255)"}
+[django_content_type]
+    *id {label:"INTEGER"}
+    app_label {label:"VARCHAR(100)"}
+    model {label:"VARCHAR(100)"}
+[authtoken_token]
+    *key {label:"VARCHAR(40)"}
+    created {label:"DATETIME"}
+    user_id {label:"CHAR(32)"}
+[django_admin_log]
+    *id {label:"INTEGER"}
+    action_flag {label:"INTEGER"}
+    action_time {label:"DATETIME"}
+    change_message {label:"TEXT"}
+    content_type_id {label:"INTEGER"}
+    object_id {label:"TEXT"}
+    object_repr {label:"VARCHAR(200)"}
+    user_id {label:"CHAR(32)"}
+[django_daraja_accesstoken]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    token {label:"VARCHAR(30)"}
+[django_migrations]
+    *id {label:"INTEGER"}
+    app {label:"VARCHAR(255)"}
+    applied {label:"DATETIME"}
+    name {label:"VARCHAR(255)"}
+[django_session]
+    *session_key {label:"VARCHAR(40)"}
+    expire_date {label:"DATETIME"}
+    session_data {label:"TEXT"}
+[django_site]
+    *id {label:"INTEGER"}
+    domain {label:"VARCHAR(100)"}
+    name {label:"VARCHAR(50)"}
+[feedback_feedback]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    feedback {label:"TEXT"}
+    rating {label:"INTEGER"}
+    user_id {label:"CHAR(32)"}
+[logs_log]
+    *id {label:"INTEGER"}
+    action {label:"VARCHAR(255)"}
+    details {label:"TEXT"}
+    log_type {label:"VARCHAR(10)"}
+    timestamp {label:"DATETIME"}
+    user_id {label:"CHAR(32)"}
+[notifications_notification]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    is_read {label:"BOOLEAN"}
+    message {label:"TEXT"}
+    notification_type_id {label:"BIGINT"}
+    title {label:"VARCHAR(255)"}
+    updated_at {label:"DATETIME"}
+    user_id {label:"CHAR(32)"}
+[notifications_notificationtype]
+    *id {label:"INTEGER"}
+    created_at {label:"DATETIME"}
+    description {label:"TEXT"}
+    name {label:"VARCHAR(2)"}
+[payments_payment]
+    *id {label:"CHAR(32)"}
+    amount {label:"DECIMAL"}
+    created_at {label:"DATETIME"}
+    payment_method {label:"VARCHAR(50)"}
+    payment_status {label:"VARCHAR(20)"}
+    result_code {label:"VARCHAR(100)"}
+    result_desc {label:"VARCHAR(100)"}
+    service_id {label:"BIGINT"}
+    service_type {label:"VARCHAR(50)"}
+    transaction_id {label:"VARCHAR(100)"}
+    updated_at {label:"DATETIME"}
+    user_id {label:"CHAR(32)"}
+[payments_refund]
+    *id {label:"CHAR(32)"}
+    created_at {label:"DATETIME"}
+    payment_id {label:"CHAR(32)"}
+    refund_amount {label:"DECIMAL"}
+    refund_reason {label:"TEXT"}
+    refund_status {label:"VARCHAR(20)"}
+[services_receipt]
+    *id {label:"INTEGER"}
+    service_id {label:"BIGINT"}
+    timestamp {label:"DATETIME"}
+[socialaccount_socialaccount]
+    *id {label:"INTEGER"}
+    date_joined {label:"DATETIME"}
+    extra_data {label:"TEXT"}
+    last_login {label:"DATETIME"}
+    provider {label:"VARCHAR(200)"}
+    uid {label:"VARCHAR(191)"}
+    user_id {label:"CHAR(32)"}
+[socialaccount_socialapp]
+    *id {label:"INTEGER"}
+    client_id {label:"VARCHAR(191)"}
+    key {label:"VARCHAR(191)"}
+    name {label:"VARCHAR(40)"}
+    provider {label:"VARCHAR(30)"}
+    provider_id {label:"VARCHAR(200)"}
+    secret {label:"VARCHAR(191)"}
+    settings {label:"TEXT"}
+[socialaccount_socialapp_sites]
+    *id {label:"INTEGER"}
+    site_id {label:"INTEGER"}
+    socialapp_id {label:"INTEGER"}
+[socialaccount_socialtoken]
+    *id {label:"INTEGER"}
+    account_id {label:"INTEGER"}
+    app_id {label:"INTEGER"}
+    expires_at {label:"DATETIME"}
+    token {label:"TEXT"}
+    token_secret {label:"TEXT"}
+[userManager_admin]
+    *customuser_ptr_id {label:"CHAR(32)"}
+    admin_code {label:"CHAR(32)"}
+[userManager_admin_permissions]
+    *id {label:"INTEGER"}
+    admin_id {label:"CHAR(32)"}
+    permission_id {label:"INTEGER"}
+[userManager_customuser_groups]
+    *id {label:"INTEGER"}
+    customuser_id {label:"CHAR(32)"}
+    group_id {label:"INTEGER"}
+[userManager_customuser_user_permissions]
+    *id {label:"INTEGER"}
+    customuser_id {label:"CHAR(32)"}
+    permission_id {label:"INTEGER"}
+[userManager_emergencycontact]
+    *id {label:"INTEGER"}
+    Patient_id {label:"CHAR(32)"}
+    email {label:"VARCHAR(254)"}
+    name {label:"VARCHAR(30)"}
+    phone_number {label:"VARCHAR(128)"}
+    relationship {label:"VARCHAR(20)"}
+[userManager_patient]
+    *customuser_ptr_id {label:"CHAR(32)"}
+    bmi {label:"REAL"}
+    date_of_birth {label:"DATE"}
+    gender {label:"VARCHAR(50)"}
+    heart_disease {label:"BOOLEAN"}
+    hypertension {label:"BOOLEAN"}
+    latitude {label:"REAL"}
+    location {label:"VARCHAR(50)"}
+    longitude {label:"REAL"}
+    smoking_history {label:"BOOLEAN"}
+[userManager_patient_emergency_contact]
+    *id {label:"INTEGER"}
+    emergencycontact_id {label:"BIGINT"}
+    patient_id {label:"CHAR(32)"}
+[userManager_provider]
+    *customuser_ptr_id {label:"CHAR(32)"}
+    Provider_name {label:"VARCHAR(255)"}
+    address {label:"VARCHAR(255)"}
+    location {label:"VARCHAR(50)"}
+    status {label:"VARCHAR(50)"}
+    verified {label:"BOOLEAN"}
+[userManager_provider_patients]
+    *id {label:"INTEGER"}
+    patient_id {label:"CHAR(32)"}
+    provider_id {label:"CHAR(32)"}
+userManager_customuser."id" 1--* account_emailaddress."user_id"
+account_emailaddress."id" 1--* account_emailconfirmation."email_address_id"
+achievements_certification."id" 1--* achievements_achievement."certification_id"
+userManager_customuser."id" 1--* achievements_achievement."user_id"
+services_service."id" ?--* appointments_appointment."service_id"
+userManager_customuser."id" ?--* appointments_appointment."provider_id"
+userManager_customuser."id" ?--* appointments_appointment."patient_id"
+services_servicetype."id" ?--* services_service."service_type_id"
+articles_articletype."id" 1--* articles_article."article_type_id"
+userManager_customuser."id" ?--* articles_article."user_id"
+auth_group."id" 1--* auth_group_permissions."group_id"
+auth_permission."id" 1--* auth_group_permissions."permission_id"
+django_content_type."id" 1--* auth_permission."content_type_id"
+userManager_customuser."id" 1--* authtoken_token."user_id"
+userManager_customuser."id" 1--* django_admin_log."user_id"
+django_content_type."id" ?--* django_admin_log."content_type_id"
+userManager_customuser."id" 1--* feedback_feedback."user_id"
+userManager_customuser."id" ?--* logs_log."user_id"
+notifications_notificationtype."id" 1--* notifications_notification."notification_type_id"
+userManager_customuser."id" ?--* notifications_notification."user_id"
+services_service."id" ?--* payments_payment."service_id"
+userManager_customuser."id" ?--* payments_payment."user_id"
+payments_payment."id" 1--* payments_refund."payment_id"
+services_service."id" 1--* services_receipt."service_id"
+userManager_customuser."id" 1--* socialaccount_socialaccount."user_id"
+socialaccount_socialapp."id" 1--* socialaccount_socialapp_sites."socialapp_id"
+django_site."id" 1--* socialaccount_socialapp_sites."site_id"
+socialaccount_socialapp."id" ?--* socialaccount_socialtoken."app_id"
+socialaccount_socialaccount."id" 1--* socialaccount_socialtoken."account_id"
+userManager_customuser."id" 1--1 userManager_admin."customuser_ptr_id"
+userManager_admin."customuser_ptr_id" 1--* userManager_admin_permissions."admin_id"
+auth_permission."id" 1--* userManager_admin_permissions."permission_id"
+userManager_customuser."id" 1--* userManager_customuser_groups."customuser_id"
+auth_group."id" 1--* userManager_customuser_groups."group_id"
+userManager_customuser."id" 1--* userManager_customuser_user_permissions."customuser_id"
+auth_permission."id" 1--* userManager_customuser_user_permissions."permission_id"
+userManager_patient."customuser_ptr_id" 1--* userManager_emergencycontact."Patient_id"
+userManager_customuser."id" 1--1 userManager_patient."customuser_ptr_id"
+userManager_patient."customuser_ptr_id" 1--* userManager_patient_emergency_contact."patient_id"
+userManager_emergencycontact."id" 1--* userManager_patient_emergency_contact."emergencycontact_id"
+userManager_customuser."id" 1--1 userManager_provider."customuser_ptr_id"
+userManager_provider."customuser_ptr_id" 1--* userManager_provider_patients."provider_id"
+userManager_patient."customuser_ptr_id" 1--* userManager_provider_patients."patient_id"

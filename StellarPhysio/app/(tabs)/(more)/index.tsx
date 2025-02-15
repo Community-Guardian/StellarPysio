@@ -55,7 +55,7 @@ const MoreScreen: React.FC = () => {
     { icon: 'star-outline', title: 'Feedback', route: '/feedback' },
     { icon: 'help-circle-outline', title: 'Help & Support', route: '/HelpScreen' },
     { icon: 'document-text-outline', title: 'Terms & Conditions', route: '/terms-conditions' },
-    { icon: 'shield-checkmark-outline', title: 'Privacy Policy', route: '/privacy-policy' },
+    // { icon: 'shield-checkmark-outline', title: 'Privacy Policy', route: '/privacy-policy' },
     { icon: 'log-out-outline', title: 'Log Out', route: '/logout' },
   ];
 
