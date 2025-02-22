@@ -149,12 +149,14 @@ npm start
 ```
 
 This will start the Expo development server, and you can open the app on your device using the Expo Go app or an emulator.
+📸 Screenshots
+![stellar](https://github.com/user-attachments/assets/fe8bbd55-9f3f-48e6-8912-c27ef9112cbe)
 
 ## Contributing
 We welcome contributions! Please read our [contributing guidelines](CONTRIBUTING.md) for more details.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the GNU GENERAL PUBLIC LICENSE License. See the [LICENSE](LICENSE) file for more information.
 
 ## Contact
 For any inquiries, please contact us at support@stellarphysio.com.
